@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import FleetManager from "./fleetmanager";
+import FleetManager from "./fleetmanager.js";
 const { Schema } = mongoose;
 
 const pointSchema = new Schema({
