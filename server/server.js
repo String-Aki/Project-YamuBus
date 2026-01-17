@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 import {connectDB} from "./database.js";
 import './firebaseAdmin.js';
 import fleetManagerRoutes from './routes/fleetManagerRoutes.js';
@@ -8,7 +9,7 @@ import routeRoutes from './routes/routeRoutes.js';
 dotenv.config();
 connectDB();
 const app = express();
-
+app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;

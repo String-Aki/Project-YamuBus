@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 const fleetManagerSchema = new Schema(
     {
-        companyName: {
+        fullName: {
             type: String,
             required: true,
-            trim: true,
+            trim: true
         },
         contactEmail:{
             type: String,
@@ -14,7 +14,25 @@ const fleetManagerSchema = new Schema(
             trim: true,
             lowercase: true
         },
+        companyName: {
+            type: String,
+            required: true,
+            trim: true,
+        },
         contactPhone:{
+            type: String,
+            required: true
+        },
+        nicNumber: {
+            type: String,
+            required: true, 
+            unique: true
+        },
+        nicFrontImage: {
+            type: String,
+            required: true
+        },
+        nicBackImage: {
             type: String,
             required: true
         },
