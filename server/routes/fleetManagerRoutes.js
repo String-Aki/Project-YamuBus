@@ -17,7 +17,7 @@ router.post("/register", registerFleetManager);
 router.get("/me", protect, getMe);
 
 router.post("/buses", protect, createBus);
-router.get("buses", protect, getMyBuses);
+router.get("/buses", protect, getMyBuses);
 router.put("/buses/:id", protect, updateBus);
 router.delete("/buses/:id", protect, deleteBus);
 

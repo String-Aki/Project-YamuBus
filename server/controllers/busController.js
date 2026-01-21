@@ -35,7 +35,7 @@ const createBus = asyncHandler(async (req, res) => {
 // @route GET /api/fleetmanager/buses
 // @access Private
 const getMyBuses = asyncHandler(async (req, res) => {
-  const buses = await Bus.findOne({ fleetManager: req.user._id });
+  const buses = await Bus.find({ fleetManager: req.user._id });
   res.status(200).json(buses);
 });
 

@@ -28,7 +28,6 @@ const Login = () => {
       };
       
       console.log("Logged in!", firebaseUser.uid);
-      alert("Login Successful!");
       navigate('/dashboard'); 
 
     } catch (error) {

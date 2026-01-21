@@ -22,34 +22,30 @@ const FleetDashboard = () => {
     const fetchData = async () => {
       try {
         const firebaseUser = auth.currentUser;
-        if (!firebaseUser) { navigate('/login'); return; }
+        if (!firebaseUser) return;
 
-        const token = await firebaseUser.getIdToken();
+        const token = await firebaseUser.getIdToken(true);
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // Get User Profile
         const userRes = await axios.get(`${API_URL}/fleetmanagers/me`, config);
         setUser(userRes.data);
 
-        // Get Buses (Mock Data with STATUS added)
         if (userRes.data.status === 'approved') {
-            try {
-                const busRes = await axios.get(`${API_URL}/fleetmanagers/buses`, config);
-                setBuses(busRes.data);
-            } catch (err) {
-                console.error("Error fetching buses", err);
-            }
+            const busRes = await axios.get(`${API_URL}/fleetmanagers/buses`, config);
+            
+            const sortedBuses = busRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setBuses(sortedBuses);
         }
 
       } catch (error) {
         console.error("Error fetching data:", error);
-         if(error.response && error.response.status === 401) navigate('/login');
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
-  }, [navigate]);
+  }, []);
 
   const handleLogout = async () => {
     await signOut(auth);

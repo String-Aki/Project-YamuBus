@@ -2,7 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import CreateAccount from './components/CreateAccount.jsx';
 import Login from './components/SignIn.jsx';
-import FleetDashboard from './components/FleetDashboard.jsx';
+import FleetDashboard from './components/FleetDashboard';
+import PrivateRoute from './components/PrivateRoute.jsx';
 
 function App() {
   return (
@@ -12,7 +13,14 @@ function App() {
         <Route path="/register" element={<CreateAccount />} />
         <Route path="/login" element={<Login />} />
 
-        <Route path='/dashboard' element={<FleetDashboard/>}/>
+        <Route 
+          path="/dashboard" 
+          element={
+            <PrivateRoute>
+              <FleetDashboard />
+            </PrivateRoute>
+          } 
+        />
       </Routes>
     </Router>
   );
