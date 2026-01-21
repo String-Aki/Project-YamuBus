@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import CreateAccount from './components/CreateAccount.jsx';
-import Login from './components/SignIn.jsx';
-import FleetDashboard from './components/FleetDashboard';
-import PrivateRoute from './components/PrivateRoute.jsx';
+import CreateAccount from './pages/CreateAccount.jsx';
+import Login from './pages/SignIn.jsx';
+import FleetDashboard from './pages/FleetDashboard';
+import PrivateRoute from './components/common/PrivateRoute.jsx';
 
 function App() {
   return (
