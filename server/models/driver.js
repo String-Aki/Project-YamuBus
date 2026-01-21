@@ -1,28 +1,65 @@
 import mongoose from "mongoose";
-import FleetManager from "./fleetmanager";
-const { Schema } = mongoose;
-const driverSchema = new Schema(
-    {
-        fullName: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        firebaseUID: {
-            type: String,
-            required: true,
-            unique: true
-        },
-        FleetManager: {
-            type: Schema.Types.ObjectId,
-            ref: 'FleetManager',
-            required: true,
-        },
+import bcrypt from "bcryptjs"; // We need this to encrypt their passwords
+
+const driverSchema = mongoose.Schema(
+  {
+    fleetManager: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'FleetManager',
     },
-    {
-        timestamps: true,
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    licenseNumber: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    phone: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    // --- LOGIN CREDENTIALS ---
+    username: {
+      type: String,
+      required: true,
+      unique: true, // Must be unique across the whole system
+      trim: true,
+      lowercase: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    // -------------------------
+    status: {
+      type: String,
+      enum: ['active', 'inactive'],
+      default: 'active'
     }
+  },
+  {
+    timestamps: true,
+  }
 );
+
+// Encrypt password before saving
+driverSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
+    next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Helper to check password later (during login)
+driverSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 const Driver = mongoose.model('Driver', driverSchema);
 export default Driver;
