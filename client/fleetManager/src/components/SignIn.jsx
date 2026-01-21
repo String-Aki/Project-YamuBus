@@ -18,7 +18,7 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      // 1. Authenticate with Firebase
+      // Authenticate with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
       const firebaseUser = userCredential.user;
       const token = await firebaseUser.getIdToken();

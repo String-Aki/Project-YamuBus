@@ -64,18 +64,18 @@ const CreateAccount = () => {
   };
 
   const handleNext = async () => {
-    // --- STEP 1 VALIDATION ---
+    // --- VALIDATION ---
     if (currentStep === 1) {
       if (!formData.fullName || !formData.email || !formData.password) return alert("Please fill all fields");
       if (formData.password !== formData.confirmPassword) return alert("Passwords do not match");
       setCurrentStep(2);
     } 
-    // --- STEP 2 VALIDATION ---
+    // --- VALIDATION ---
     else if (currentStep === 2) {
       if (!formData.companyName || !formData.contactPhone || !formData.nicID) return alert("Please fill company details and NIC");
       setCurrentStep(3);
     } 
-    // --- STEP 3 VALIDATION ---
+    // --- VALIDATION ---
     else if (currentStep === 3) {
       if (!nicFront || !nicBack) return alert("Please upload both NIC images");
       handleSubmit();
@@ -155,7 +155,7 @@ const CreateAccount = () => {
           ))}
         </div>
 
-        {/* SCROLLABLE FORM */}
+        {/* Stepper FORM */}
         <div className="w-full flex-1 overflow-y-auto custom-scrollbar pr-1">
           
           {/* STEP 1 */}

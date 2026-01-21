@@ -3,7 +3,6 @@ import axios from 'axios';
 import { FaBus, FaMapSigns, FaTimes } from 'react-icons/fa';
 import { auth } from '../firebase'; 
 
-// REPLACE WITH YOUR IP IF ON MOBILE
 // const API_URL = 'http://localhost:5000/api'; 
 const API_URL = 'http://192.168.43.96:5000/api'; 
 

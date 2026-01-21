@@ -15,7 +15,6 @@ const FleetDashboard = () => {
   const [selectedBus, setSelectedBus] = useState(null);
   const navigate = useNavigate();
 
-  // REPLACE WITH YOUR IP IF ON MOBILE
 //   const API_URL = 'http://localhost:5000/api'; 
   const API_URL = 'http://192.168.43.96:5000/api'; 
 
@@ -28,11 +27,11 @@ const FleetDashboard = () => {
         const token = await firebaseUser.getIdToken();
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        // 1. Get User Profile
+        // Get User Profile
         const userRes = await axios.get(`${API_URL}/fleetmanagers/me`, config);
         setUser(userRes.data);
 
-        // 2. Get Buses (Mock Data with STATUS added)
+        // Get Buses (Mock Data with STATUS added)
         if (userRes.data.status === 'approved') {
             try {
                 const busRes = await axios.get(`${API_URL}/fleetmanagers/buses`, config);

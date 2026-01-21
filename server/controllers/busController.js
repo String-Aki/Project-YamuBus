@@ -50,13 +50,11 @@ const updateBus = asyncHandler(async (req, res) => {
     throw new Error("Bus not found");
   }
 
-  // Security Check: Ensure the logged-in user owns this bus
   if (bus.fleetManager.toString() !== req.user.id) {
     res.status(401);
     throw new Error("User not authorized");
   }
 
-  // Update fields if they are provided
   bus.licensePlate = req.body.licensePlate || bus.licensePlate;
   bus.route = req.body.route || bus.route;
 

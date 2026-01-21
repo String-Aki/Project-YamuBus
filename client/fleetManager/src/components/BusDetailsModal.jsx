@@ -3,7 +3,6 @@ import axios from 'axios';
 import { FaBus, FaMapSigns, FaTimes, FaTrash, FaSave, FaUserTie } from 'react-icons/fa';
 import { auth } from '../firebase'; 
 
-// REPLACE WITH YOUR IP
 // const API_URL = 'http://localhost:5000/api'; 
 const API_URL = 'http://192.168.43.96:5000/api';
 
@@ -17,7 +16,6 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onUpdate, onDelete }) => {
 
   if (!isOpen || !bus) return null;
 
-  // Handle Input Changes (with formatting magic)
   const handleChange = (e) => {
     const { name, value } = e.target;
     let newValue = value;
@@ -38,7 +36,7 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onUpdate, onDelete }) => {
         formData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      onUpdate(res.data); // Update parent list
+      onUpdate(res.data);
       setIsEditing(false);
       onClose();
     } catch (error) {
