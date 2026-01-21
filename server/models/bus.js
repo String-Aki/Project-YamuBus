@@ -8,34 +8,31 @@ const busSchema = new Schema(
       required: true,
       unique: true,
       trim: true,
-    },
-    capacity: {
-      type: Number,
-      default: 52,
-    },
-    firebaseUID: {
-      type: String,
-      required: true,
-      unique: true,
+      uppercase: true,
     },
     fleetManager: {
       type: Schema.Types.ObjectId,
       ref: "FleetManager",
       required: true,
     },
-    route: {
-      type: Schema.Types.ObjectId,
-      ref: "Route",
-      required: true,
+    currentDriver: {
+      type: String,
+      default: null,
     },
-    currentLocation: {
-      lat: { type: Number },
-      lng: { type: Number },
+    route: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    status: {
+      type: String,
+      enum: ["online", "offline"],
+      default: "offline",
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Bus = mongoose.model("Bus", busSchema);

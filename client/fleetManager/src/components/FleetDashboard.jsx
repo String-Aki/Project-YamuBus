@@ -3,12 +3,14 @@ import { FaSignOutAlt, FaPlus, FaChevronRight, FaUserCircle, FaCircle } from 're
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase'; 
 import { signOut } from 'firebase/auth';
+import AddBusModal from './AddBusModal';
 import axios from 'axios';
 
 const FleetDashboard = () => {
   const [user, setUser] = useState(null);
   const [buses, setBuses] = useState([]); 
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   // REPLACE WITH YOUR IP IF ON MOBILE
@@ -30,13 +32,12 @@ const FleetDashboard = () => {
 
         // 2. Get Buses (Mock Data with STATUS added)
         if (userRes.data.status === 'approved') {
-            setBuses([
-                { _id: '1', licensePlate: 'ND - 5681', status: 'online' },
-                { _id: '2', licensePlate: 'ND - 5682', status: 'offline' },
-                { _id: '3', licensePlate: 'ND - 5683', status: 'online' },
-                { _id: '4', licensePlate: 'ND - 5684', status: 'offline' },
-                { _id: '5', licensePlate: 'ND - 5685', status: 'online' },
-            ]);
+            try {
+                const busRes = await axios.get(`${API_URL}/fleetmanagers/buses`, config);
+                setBuses(busRes.data);
+            } catch (err) {
+                console.error("Error fetching buses", err);
+            }
         }
 
       } catch (error) {
@@ -52,6 +53,10 @@ const FleetDashboard = () => {
   const handleLogout = async () => {
     await signOut(auth);
     navigate('/login');
+  };
+
+  const handleBusAdded = (newBus) => {
+    setBuses([...buses, newBus]);
   };
 
   if (loading) return <div className="flex h-screen items-center justify-center bg-brand-brown text-white font-bold">Loading...</div>;
@@ -71,7 +76,7 @@ const FleetDashboard = () => {
 
         {user?.status === 'approved' && (
             <button 
-                onClick={() => alert("Add Bus function coming next!")}
+                onClick={() => setIsModalOpen(true)}
                 className="flex items-center gap-2 bg-[#3a4149] hover:bg-gray-700 text-white px-4 py-2 rounded-full font-semibold transition-colors shadow-sm"
             >
                 <span>Add Bus</span>
@@ -123,7 +128,11 @@ const FleetDashboard = () => {
              )
         ) : null}
       </div>
-
+        <AddBusModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onBusAdded={handleBusAdded} 
+      />
     </div>
   );
 };
