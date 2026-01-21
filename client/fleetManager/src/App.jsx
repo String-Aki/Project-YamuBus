@@ -12,6 +12,7 @@ function App() {
         <Route path="/register" element={<CreateAccount />} />
         <Route path="/login" element={<Login />} />
 
+        <Route path='/dashboard' element={<FleetDashboard/>}/>
       </Routes>
     </Router>
   );

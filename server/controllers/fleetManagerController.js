@@ -42,4 +42,12 @@ const registerFleetManager = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerFleetManager };
+// @desc Get current fleet manager data
+// @route Get /api/fleetmanagers/me
+// @acces Private
+
+const getMe = asyncHandler(async(req, res) =>{
+  res.status(200).json(req.user);
+});
+
+export { registerFleetManager, getMe };

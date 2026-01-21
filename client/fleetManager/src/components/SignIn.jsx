@@ -28,10 +28,8 @@ const Login = () => {
       };
       
       console.log("Logged in!", firebaseUser.uid);
-      alert("Login Successful! (Dashboard coming next)");
-      
-      // Navigate to Dashboard (Placeholder)
-      // navigate('/dashboard'); 
+      alert("Login Successful!");
+      navigate('/dashboard'); 
 
     } catch (error) {
       console.error("Login Error:", error);
