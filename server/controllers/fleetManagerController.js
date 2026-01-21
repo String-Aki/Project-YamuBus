@@ -45,7 +45,6 @@ const registerFleetManager = asyncHandler(async (req, res) => {
 // @desc Get current fleet manager data
 // @route Get /api/fleetmanagers/me
 // @acces Private
-
 const getMe = asyncHandler(async(req, res) =>{
   res.status(200).json(req.user);
 });

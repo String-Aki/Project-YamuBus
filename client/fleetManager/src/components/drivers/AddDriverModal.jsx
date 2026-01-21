@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { QRCodeSVG } from "qrcode.react"; // <--- The Library
+import { QRCodeSVG } from "qrcode.react";
 import {
   FaUser,
   FaIdCard,
@@ -13,16 +13,13 @@ import {
 } from "react-icons/fa";
 import { auth } from "../../firebase";
 
-// REPLACE WITH YOUR IP
-// const API_URL = "http://localhost:5000/api";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
-  const [step, setStep] = useState(1); // 1 = Form, 2 = Success/QR
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Form Data
   const [formData, setFormData] = useState({
     name: "",
     licenseNumber: "",
@@ -31,7 +28,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
     password: "",
   });
 
-  // Reset when closed
   if (!isOpen) return null;
 
   const handleChange = (e) =>
@@ -46,15 +42,12 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
       const token = await auth.currentUser.getIdToken();
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      // 1. Send to Backend (Hashes password & saves to DB)
       const res = await axios.post(
         `${API_URL}/fleetmanagers/drivers`,
         formData,
         config,
       );
 
-      // 2. On Success, move to Step 2 (QR Generation)
-      // Note: We use the 'formData.password' here because the backend won't return it!
       onDriverAdded(res.data);
       setStep(2);
     } catch (err) {
@@ -77,7 +70,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
     onClose();
   };
 
-  // The content of the QR Code (The "Key" for the Driver App)
   const qrValue = JSON.stringify({
     u: formData.username,
     p: formData.password,
@@ -86,7 +78,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative animate-fadeIn">
-        {/* Close Button */}
         <button
           onClick={handleClose}
           className="absolute top-5 right-5 text-gray-400 hover:text-gray-600"
@@ -94,7 +85,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
           <FaTimes className="text-xl" />
         </button>
 
-        {/* ================= STEP 1: THE FORM ================= */}
         {step === 1 && (
           <>
             <h2 className="text-2xl font-bold text-gray-800 mb-1">
@@ -191,7 +181,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
           </>
         )}
 
-        {/* ================= STEP 2: THE QR CARD ================= */}
         {step === 2 && (
           <div className="flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 text-green-600">
@@ -206,8 +195,7 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
               security reasons, it cannot be recovered later.
             </p>
 
-            {/* THE QR ID CARD */}
-            <div className="bg-white border-2 border-dashed border-gray-300 p-6 rounded-xl mb-6 w-full flex flex-col items-center shadow-sm">
+            <div id="printable-card" className="bg-white border-2 border-dashed border-gray-300 p-6 rounded-xl mb-6 w-full flex flex-col items-center shadow-sm">
               <h3 className="font-bold text-xl uppercase tracking-widest text-brand-dark mb-1">
                 Driver ID
               </h3>
@@ -221,6 +209,9 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
 
               <p className="text-xs font-mono text-gray-400 mt-4">
                 USER: {formData.username}
+              </p>
+              <p className="text-xs font-mono text-gray-400 mt-4">
+                PASS: {formData.password}
               </p>
             </div>
 

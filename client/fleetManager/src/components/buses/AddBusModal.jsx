@@ -3,7 +3,6 @@ import axios from "axios";
 import { FaBus, FaMapSigns, FaTimes } from "react-icons/fa";
 import { auth } from "../../firebase";
 
-// const API_URL = 'http://localhost:5000/api';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
@@ -57,7 +56,7 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative animate-fadeIn">
-        {/* Close Button */}
+        
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
@@ -69,7 +68,6 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
           Add New Bus
         </h2>
 
-        {/* License Plate Input */}
         <div className="mb-4">
           <label className="text-xs font-bold text-gray-500 uppercase ml-3">
             License Plate
@@ -87,7 +85,6 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
           </div>
         </div>
 
-        {/* Route Input */}
         <div className="mb-8">
           <label className="text-xs font-bold text-gray-500 uppercase ml-3">
             Route Number/Name
@@ -105,7 +102,6 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
           </div>
         </div>
 
-        {/* Submit Button */}
         <button
           onClick={handleSubmit}
           disabled={loading}

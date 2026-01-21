@@ -32,7 +32,6 @@ const FleetDashboard = () => {
   const [isAddDriverOpen, setIsAddDriverOpen] = useState(false);
 
   const navigate = useNavigate();
-  // const API_URL = 'http://localhost:5000/api';
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -101,7 +100,6 @@ const FleetDashboard = () => {
 
   const handleDriverAdded = (newDriver) => {
     setDrivers([newDriver, ...drivers]);
-    // Note: The modal stays open on step 2 (QR view) until user clicks "Done"
   };
 
   const handleDeleteDriver = async (driverId, e) => {
@@ -133,7 +131,7 @@ const FleetDashboard = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-brand-brown relative">
-      {/* ---- HEADER ----*/}
+      {/* ---- Header ----*/}
       <div className="bg-brand-dark text-white rounded-b-[2.5rem] shadow-xl flex-none z-20 overflow-hidden">
         <div className="flex justify-between items-center p-6 pb-2">
           <div className="flex items-center gap-3">
@@ -188,7 +186,7 @@ const FleetDashboard = () => {
         </div>
       </div>
 
-      {/* ---- MAIN CONTENT ---- */}
+      {/* ---- Main Content ---- */}
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-10 custom-scrollbar z-0">
         {user?.status === "pending" && (
           <div className="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r shadow-md mb-6 animate-fadeIn">
@@ -203,7 +201,7 @@ const FleetDashboard = () => {
           </div>
         )}
 
-        {/* BUS LIST VIEW */}
+        {/* Bus List View */}
         {activeTab === "buses" &&
           (buses.length > 0 ? (
             buses.map((bus) => (
@@ -252,7 +250,7 @@ const FleetDashboard = () => {
             </div>
           ))}
 
-        {/* --- DRIVER LIST (NEW) --- */}
+        {/* --- Driver List View --- */}
         {activeTab === "drivers" &&
           (drivers.length > 0 ? (
             drivers.map((driver) => (
@@ -272,7 +270,7 @@ const FleetDashboard = () => {
                     <span>{driver.licenseNumber}</span>
                   </div>
                 </div>
-                {/* Delete Button for Driver */}
+                
                 <button
                   onClick={(e) => handleDeleteDriver(driver._id, e)}
                   className="bg-red-50 h-10 w-10 rounded-full flex items-center justify-center text-red-500 active:bg-red-100"
@@ -289,14 +287,13 @@ const FleetDashboard = () => {
               <h2 className="text-2xl font-bold">No Drivers Yet</h2>
               <p className="text-sm text-center max-w-xs mt-2 opacity-80">
                 {user?.status === "approved"
-                  ? "Add drivers to generate their QR Login Cards."
-                  : "Approval required."}
+                  ? "Tap + Add Drivers to add drivers to your fleet and start your first trip."
+                  : "Approval required to add drivers."}
               </p>
             </div>
           ))}
       </div>
 
-      {/* MODALS */}
       <AddBusModal
         isOpen={isAddBusOpen}
         onClose={() => setIsAddBusOpen(false)}

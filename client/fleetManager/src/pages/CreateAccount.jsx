@@ -63,19 +63,17 @@ const CreateAccount = () => {
     }
   };
 
+  // --- VALIDATION ---
   const handleNext = async () => {
-    // --- VALIDATION ---
     if (currentStep === 1) {
       if (!formData.fullName || !formData.email || !formData.password) return alert("Please fill all fields");
       if (formData.password !== formData.confirmPassword) return alert("Passwords do not match");
       setCurrentStep(2);
     } 
-    // --- VALIDATION ---
     else if (currentStep === 2) {
       if (!formData.companyName || !formData.contactPhone || !formData.nicID) return alert("Please fill company details and NIC");
       setCurrentStep(3);
     } 
-    // --- VALIDATION ---
     else if (currentStep === 3) {
       if (!nicFront || !nicBack) return alert("Please upload both NIC images");
       handleSubmit();
@@ -157,8 +155,7 @@ const CreateAccount = () => {
 
         {/* Stepper FORM */}
         <div className="w-full flex-1 overflow-y-auto custom-scrollbar pr-1">
-          
-          {/* STEP 1 */}
+
           {currentStep === 1 && (
             <>
               <InputField type="text" name="fullName" placeholder="Full Name" value={formData.fullName} onChange={handleChange} />
@@ -168,7 +165,6 @@ const CreateAccount = () => {
             </>
           )}
 
-          {/* STEP 2 */}
           {currentStep === 2 && (
             <>
               <InputField type="text" name="companyName" placeholder="Company Name" value={formData.companyName} onChange={handleChange} />
@@ -177,7 +173,6 @@ const CreateAccount = () => {
             </>
           )}
 
-          {/* STEP 3 */}
           {currentStep === 3 && (
             <div className="flex flex-col gap-3 w-full">
               <input type="file" ref={frontInputRef} onChange={(e) => handleImageChange(e, 'front')} className="hidden" accept="image/*" />
@@ -193,8 +188,7 @@ const CreateAccount = () => {
             </div>
           )}
         </div>
-
-        {/* FOOTER BUTTON */}
+        
         <div className="w-full mt-auto pt-4 pb-2">
           <button onClick={handleNext} disabled={isLoading} className={`w-full py-4 rounded-full text-white text-xl font-bold shadow-lg transition-transform ${isLoading ? 'bg-gray-500' : 'bg-brand-brown active:scale-95'}`}>
             {isLoading ? "Processing..." : (currentStep === 3 ? "Submit" : "Next")}

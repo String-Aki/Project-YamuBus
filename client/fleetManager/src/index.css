@@ -5,3 +5,40 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+
+@media print {
+  html, body {
+    height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  #printable-card, #printable-card * {
+    visibility: visible;
+  }
+
+  #printable-card {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 350px;
+    border: 2px solid black !important;
+    border-radius: 12px;
+    padding: 20px;
+
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  button {
+    display: none !important;
+  }
+}

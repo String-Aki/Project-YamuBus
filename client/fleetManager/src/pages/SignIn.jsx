@@ -41,19 +41,17 @@ const Login = () => {
   return (
     <div className="flex flex-col h-[100dvh] bg-brand-brown overflow-hidden">
       
-      {/* HEADER */}
+      {/* Header */}
       <div className="flex-none p-6 pt-12 text-white min-h-[150px] flex flex-col justify-end">
         <div className="text-right">
           <h1 className="text-4xl font-semibold leading-tight">Welcome<br />Back</h1>
         </div>
       </div>
 
-      {/* DARK CARD */}
       <div className="flex-1 bg-brand-dark rounded-tl-[3rem] px-6 py-10 flex flex-col items-center w-full">
         
         <div className="w-full flex-1 mt-4">
-          
-          {/* Email Input */}
+
           <div className="relative w-full mb-6">
             <input 
               type="email" 
@@ -65,7 +63,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Password Input */}
           <div className="relative w-full mb-8">
             <input 
               type={showPassword ? "text" : "password"} 
@@ -83,7 +80,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Sign In Button */}
           <button 
             onClick={handleLogin}
             disabled={isLoading}
@@ -92,7 +88,6 @@ const Login = () => {
             {isLoading ? "Signing In..." : "Sign In"}
           </button>
 
-          {/* Links */}
           <div className="mt-6 text-center text-white space-y-4">
             <p className="text-sm text-gray-400 cursor-pointer">Forgot Password?</p>
             <p className="text-sm">

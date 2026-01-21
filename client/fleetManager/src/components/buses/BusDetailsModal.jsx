@@ -10,7 +10,6 @@ import {
 } from "react-icons/fa";
 import { auth } from "../../firebase";
 
-// const API_URL = 'http://localhost:5000/api';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const BusDetailsModal = ({ bus, isOpen, onClose, onUpdate, onDelete }) => {
@@ -89,7 +88,6 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onUpdate, onDelete }) => {
           <FaTimes className="text-xl" />
         </button>
 
-        {/* HEADER: DRIVER INFO */}
         <div className="text-center mb-6">
           <div
             className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-2 ${bus.currentDriver ? "bg-brand-brown text-white" : "bg-gray-100 text-gray-400"}`}
@@ -111,7 +109,6 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onUpdate, onDelete }) => {
 
         <hr className="border-gray-100 mb-6" />
 
-        {/* FORM / DETAILS */}
         <div className="space-y-4">
           <div>
             <label className="text-xs font-bold text-gray-400 uppercase ml-2">
@@ -148,7 +145,6 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onUpdate, onDelete }) => {
           </div>
         </div>
 
-        {/* ACTIONS */}
         <div className="mt-8 flex gap-3">
           {isEditing ? (
             <>
