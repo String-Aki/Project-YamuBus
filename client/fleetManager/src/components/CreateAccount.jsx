@@ -3,6 +3,7 @@ import { FaArrowLeft, FaEye, FaEyeSlash, FaCamera } from 'react-icons/fa';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, storage } from '../firebase.js'; 
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const InputField = ({ type, name, placeholder, value, icon, toggleIcon, onChange }) => (
@@ -29,6 +30,7 @@ const InputField = ({ type, name, placeholder, value, icon, toggleIcon, onChange
 const CreateAccount = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   
   const [formData, setFormData] = useState({
     fullName: '', email: '', password: '', confirmPassword: '', nicID: '',
@@ -112,6 +114,7 @@ const CreateAccount = () => {
       });
 
       alert("Account Created & Verified! Please Login.");
+      navigate('/login');
 
     } catch (error) {
       console.error("Error:", error);
@@ -196,6 +199,9 @@ const CreateAccount = () => {
           <button onClick={handleNext} disabled={isLoading} className={`w-full py-4 rounded-full text-white text-xl font-bold shadow-lg transition-transform ${isLoading ? 'bg-gray-500' : 'bg-brand-brown active:scale-95'}`}>
             {isLoading ? "Processing..." : (currentStep === 3 ? "Submit" : "Next")}
           </button>
+          <p className="text-white text-sm mt-4">
+            Already have an account? <span className="font-bold underline cursor-pointer" onClick={() => navigate('/login')}>Sign In</span>
+          </p>
         </div>
 
       </div>
