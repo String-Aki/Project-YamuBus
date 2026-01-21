@@ -34,10 +34,54 @@ const createBus = asyncHandler(async (req, res) => {
 // @desc Get all buses for the logged-in Fleet Manager
 // @route GET /api/fleetmanager/buses
 // @access Private
-
 const getMyBuses = asyncHandler(async (req, res) => {
   const buses = await Bus.findOne({ fleetManager: req.user._id });
   res.status(200).json(buses);
 });
 
-export { createBus, getMyBuses };
+// @desc    Update bus details (Plate or Route)
+// @route   PUT /api/fleetmanagers/buses/:id
+// @access  Private
+const updateBus = asyncHandler(async (req, res) => {
+  const bus = await Bus.findById(req.params.id);
+
+  if (!bus) {
+    res.status(404);
+    throw new Error("Bus not found");
+  }
+
+  // Security Check: Ensure the logged-in user owns this bus
+  if (bus.fleetManager.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error("User not authorized");
+  }
+
+  // Update fields if they are provided
+  bus.licensePlate = req.body.licensePlate || bus.licensePlate;
+  bus.route = req.body.route || bus.route;
+
+  const updatedBus = await bus.save();
+  res.status(200).json(updatedBus);
+});
+
+// @desc    Delete a bus
+// @route   DELETE /api/fleetmanagers/buses/:id
+// @access  Private
+const deleteBus = asyncHandler(async (req, res) => {
+  const bus = await Bus.findById(req.params.id);
+
+  if (!bus) {
+    res.status(404);
+    throw new Error("Bus not found");
+  }
+
+  if (bus.fleetManager.toString() !== req.user.id) {
+    res.status(401);
+    throw new Error("User not authorized");
+  }
+
+  await bus.deleteOne();
+  res.status(200).json({ id: req.params.id });
+});
+
+export { createBus, getMyBuses, updateBus, deleteBus };

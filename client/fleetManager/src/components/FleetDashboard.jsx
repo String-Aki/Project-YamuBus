@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase'; 
 import { signOut } from 'firebase/auth';
 import AddBusModal from './AddBusModal';
+import BusDetailsModal from './BusDetailsModal';
 import axios from 'axios';
 
 const FleetDashboard = () => {
@@ -11,6 +12,7 @@ const FleetDashboard = () => {
   const [buses, setBuses] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBus, setSelectedBus] = useState(null);
   const navigate = useNavigate();
 
   // REPLACE WITH YOUR IP IF ON MOBILE
@@ -59,6 +61,14 @@ const FleetDashboard = () => {
     setBuses([...buses, newBus]);
   };
 
+  const handleBusUpdated = (updatedBus) => {
+    setBuses(buses.map(b => b._id === updatedBus._id ? updatedBus : b));
+  };
+
+  const handleBusDeleted = (busId) => {
+    setBuses(buses.filter(b => b._id !== busId));
+  };
+
   if (loading) return <div className="flex h-screen items-center justify-center bg-brand-brown text-white font-bold">Loading...</div>;
 
   return (
@@ -98,11 +108,18 @@ const FleetDashboard = () => {
         {user?.status === 'approved' ? (
              buses.length > 0 ? (
                 buses.map((bus) => (
-                    <div key={bus._id} className="flex items-center justify-between bg-[#f8f8f8] p-4 rounded-[2rem] shadow-md mb-4 cursor-pointer active:scale-95 transition-transform">
+                    <div key={bus._id} onClick={() => setSelectedBus(bus)} className="flex items-center justify-between bg-[#f8f8f8] p-4 rounded-[2rem] shadow-md mb-4 cursor-pointer active:scale-95 transition-transform">
                         
                         {/* Left: Plate + Status */}
                         <div className="flex flex-col ml-2">
                              <h3 className="text-xl font-bold text-gray-800 mb-1">{bus.licensePlate}</h3>
+
+                             {bus.currentDriver && (
+                                <div className="flex items-center gap-1 text-xs text-gray-600 font-bold mb-1">
+                                    <FaUserTie className="text-brand-brown" />
+                                    <span>{bus.currentDriver}</span>
+                                </div>
+                             )}
                              
                              {/* Status Pill */}
                              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold w-fit ${
@@ -132,6 +149,14 @@ const FleetDashboard = () => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onBusAdded={handleBusAdded} 
+      />
+
+      <BusDetailsModal
+        bus={selectedBus}
+        isOpen={!!selectedBus}
+        onClose={() => setSelectedBus(null)}
+        onUpdate={handleBusUpdated}
+        onDelete={handleBusDeleted}
       />
     </div>
   );
