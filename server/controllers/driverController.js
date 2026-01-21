@@ -12,14 +12,12 @@ const createDriver = asyncHandler(async (req, res) => {
         throw new Error('Please fill all fields');
     }
 
-    // 1. Check if username is taken
     const driverExists = await Driver.findOne({ username });
     if(driverExists) {
         res.status(400);
         throw new Error('Username already taken. Please choose another.');
     }
 
-    // 2. Create Driver linked to YOU
     const driver = await Driver.create({
         fleetManager: req.user._id,
         name,
@@ -33,7 +31,9 @@ const createDriver = asyncHandler(async (req, res) => {
         res.status(201).json({
             _id: driver._id,
             name: driver.name,
-            username: driver.username
+            username: driver.username,
+            licenseNumber: driver.licenseNumber,
+            phone: driver.phone
         });
     } else {
         res.status(400);
@@ -45,7 +45,7 @@ const createDriver = asyncHandler(async (req, res) => {
 // @route   GET /api/fleetmanagers/drivers
 // @access  Private
 const getMyDrivers = asyncHandler(async (req, res) => {
-    const drivers = await Driver.find({ fleetManager: req.user._id }).select('-password'); // Don't send password back
+    const drivers = await Driver.find({ fleetManager: req.user._id }).select('-password');
     res.status(200).json(drivers);
 });
 
@@ -60,7 +60,6 @@ const deleteDriver = asyncHandler(async (req, res) => {
         throw new Error("Driver not found");
     }
 
-    // Security: Ensure you own this driver
     if (driver.fleetManager.toString() !== req.user.id) {
         res.status(401);
         throw new Error("Not authorized");
