@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import {connectDB} from "./database.js";
-import './firebaseAdmin.js';
+import {connectDB} from "./config/database.js";
+import './config/firebaseAdmin.js';
 import fleetManagerRoutes from './routes/fleetManagerRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
 import routeRoutes from './routes/routeRoutes.js';

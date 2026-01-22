@@ -1,15 +1,34 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
+import SetupBus from './pages/SetupBus';
 
-const Dashboard = () => <div className="text-white p-10"><h1>Welcome Driver!</h1></div>;
+const ProtectedRoute = ({ children }) => {
+    const busId = localStorage.getItem('MOUNTED_BUS_ID');
+    if (!busId) {
+        return <Navigate to="/setup" replace />;
+    }
+    return children;
+};
 
 const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/setup" element={<SetupBus />} />
+
+        <Route path="/login" element={
+            <ProtectedRoute>
+                <Login />
+            </ProtectedRoute>
+        } />
+
+        <Route path="/dashboard" element={
+            <ProtectedRoute>
+                 {/* Dashboard will now be the "Active Trip" screen */}
+                 <div className="text-white">Trip Screen Placeholder</div> 
+            </ProtectedRoute>
+        } />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

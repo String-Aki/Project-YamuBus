@@ -1,4 +1,4 @@
-import admin from '../firebaseAdmin.js';
+import admin from '../config/firebaseAdmin.js';
 import asyncHandler from 'express-async-handler';
 import FleetManager from '../models/fleetmanager.js';
 

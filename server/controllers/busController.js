@@ -1,5 +1,7 @@
 import asyncHandler from "express-async-handler";
+import admin from '../config/firebaseAdmin.js'
 import Bus from "../models/bus.js";
+import FleetManager from "../models/fleetmanager.js";
 import Route from "../models/route.js";
 
 // @desc    Add a new bus
@@ -82,4 +84,34 @@ const deleteBus = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
-export { createBus, getMyBuses, updateBus, deleteBus };
+// @desc    Get buses for device setup
+// @route   POST /api/fleetmanagers/setup/buses
+// @access  Public
+const getBusesForSetup = asyncHandler(async (req, res) => {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+        res.status(401);
+        throw new Error("No token provided");
+    }
+
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const email = decodedToken.email;
+        const manager = await FleetManager.findOne({ contactEmail: email });
+        if (!manager) {
+            res.status(404);
+            throw new Error("Manager not found in database");
+        }
+
+        const buses = await Bus.find({ fleetManager: manager._id }).select('licensePlate _id');
+        res.json(buses);
+
+    } catch (error) {
+        console.error("Firebase Auth Error:", error);
+        res.status(401);
+        throw new Error("Invalid or Expired Token");
+    }
+});
+
+export { createBus, getMyBuses, updateBus, deleteBus, getBusesForSetup };

@@ -1,7 +1,7 @@
 import admin from 'firebase-admin';
 import fs from 'fs';
 
-const keyPath = new URL('./serviceAccountKey.json', import.meta.url);
+const keyPath = new URL('../serviceAccountKey.json', import.meta.url);
 
 try {
     const serviceAccount = JSON.parse(fs.readFileSync(keyPath,'utf8'));

@@ -8,6 +8,7 @@ import {
   getMyBuses,
   updateBus,
   deleteBus,
+  getBusesForSetup
 } from "../controllers/busController.js";
 import {
   createDriver,
@@ -27,6 +28,7 @@ router.post("/buses", protect, createBus);
 router.get("/buses", protect, getMyBuses);
 router.put("/buses/:id", protect, updateBus);
 router.delete("/buses/:id", protect, deleteBus);
+router.post("/setup/buses", getBusesForSetup);
 
 //Driver Routes
 router.post("/drivers", protect, createDriver); 
