@@ -1,3 +1,6 @@
-# Firebase Private Key
 serviceAccountKey.json
 README.md
+
+server/.env
+client/driver/.env
+client/fleetManager/.env
