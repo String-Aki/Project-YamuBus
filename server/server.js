@@ -4,6 +4,7 @@ import cors from "cors";
 import {connectDB} from "./database.js";
 import './firebaseAdmin.js';
 import fleetManagerRoutes from './routes/fleetManagerRoutes.js';
+import driverRoutes from './routes/driverRoutes.js';
 import routeRoutes from './routes/routeRoutes.js';
 
 dotenv.config();
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/fleetmanagers', fleetManagerRoutes);
+app.use('/api/drivers', driverRoutes);
 app.use('/api/routes', routeRoutes);
 
 app.listen(PORT, () => {
