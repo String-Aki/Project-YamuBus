@@ -104,7 +104,9 @@ const getBusesForSetup = asyncHandler(async (req, res) => {
             throw new Error("Manager not found in database");
         }
 
-        const buses = await Bus.find({ fleetManager: manager._id }).select('licensePlate _id');
+        const buses = await Bus.find({ fleetManager: manager._id })
+        .select('licensePlate _id route status');
+
         res.json(buses);
 
     } catch (error) {

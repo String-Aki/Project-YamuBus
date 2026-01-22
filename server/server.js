@@ -5,6 +5,7 @@ import {connectDB} from "./config/database.js";
 import './config/firebaseAdmin.js';
 import fleetManagerRoutes from './routes/fleetManagerRoutes.js';
 import driverRoutes from './routes/driverRoutes.js';
+import tripRoutes from './routes/tripRoutes.js'
 import routeRoutes from './routes/routeRoutes.js';
 
 dotenv.config();
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 app.use('/api/fleetmanagers', fleetManagerRoutes);
 app.use('/api/drivers', driverRoutes);
+app.use('/api/trips', tripRoutes);
 app.use('/api/routes', routeRoutes);
 
 app.listen(PORT, () => {

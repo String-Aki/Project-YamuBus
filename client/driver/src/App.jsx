@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import SetupBus from './pages/SetupBus';
+import Dashboard from './pages/Dashboard';
+import Trip from './pages/Trip'
 
 const ProtectedRoute = ({ children }) => {
     const busId = localStorage.getItem('MOUNTED_BUS_ID');
@@ -25,8 +27,13 @@ const App = () => {
 
         <Route path="/dashboard" element={
             <ProtectedRoute>
-                 {/* Dashboard will now be the "Active Trip" screen */}
-                 <div className="text-white">Trip Screen Placeholder</div> 
+                  <Dashboard />
+            </ProtectedRoute>
+        } />
+
+        <Route path="/trip" element={
+            <ProtectedRoute>
+                 <Trip />
             </ProtectedRoute>
         } />
 

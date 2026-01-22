@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Driver from "../models/driver.js";
+import Trip from "../models/trip.js";
 import asyncHandler from "express-async-handler";
 
 const generateToken = (id) => {
@@ -121,6 +122,16 @@ const loginDriver = asyncHandler(async (req, res) => {
     if (driver.status === 'inactive') {
         res.status(401);
         throw new Error('Driver account is inactive');
+    }
+
+    const activeTrip = await Trip.findOne({ 
+        driver: driver._id, 
+        status: 'active' 
+    }).populate('bus', 'licensePlate');
+
+    if (activeTrip) {
+        res.status(400);
+        throw new Error(`You are already active on bus ${activeTrip.bus.licensePlate}. End that trip first.`);
     }
 
     res.json({
