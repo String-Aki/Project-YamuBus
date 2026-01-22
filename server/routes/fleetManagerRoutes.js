@@ -12,6 +12,7 @@ import {
 import {
   createDriver,
   getMyDrivers,
+  updateDriver,
   deleteDriver,
 } from "../controllers/driverController.js";
 import { protect } from "../middleware/authMiddleware.js";
@@ -28,8 +29,9 @@ router.put("/buses/:id", protect, updateBus);
 router.delete("/buses/:id", protect, deleteBus);
 
 //Driver Routes
-router.post("/drivers", protect, createDriver); // Add Driver
-router.get("/drivers", protect, getMyDrivers); // List Drivers
-router.delete("/drivers/:id", protect, deleteDriver); // Delete Driver
+router.post("/drivers", protect, createDriver); 
+router.get("/drivers", protect, getMyDrivers);
+router.put("/drivers/:id", protect, updateDriver);
+router.delete("/drivers/:id", protect, deleteDriver);
 
 export default router;

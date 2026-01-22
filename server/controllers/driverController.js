@@ -49,6 +49,39 @@ const getMyDrivers = asyncHandler(async (req, res) => {
     res.status(200).json(drivers);
 });
 
+
+// @desc    Update driver details
+// @route   PUT /api/fleetmanagers/drivers/:id
+// @access  Private
+const updateDriver = asyncHandler(async (req, res) => {
+    const { name, licenseNumber, phone } = req.body;
+    const driver = await Driver.findById(req.params.id);
+    
+    if (!driver) {
+        res.status(404);
+        throw new Error("Driver not found");
+    }
+
+    if (driver.fleetManager.toString() !== req.user.id) {
+        res.status(401);
+        throw new Error("Not authorized");
+    }
+
+    driver.name = name || driver.name;
+    driver.licenseNumber = licenseNumber || driver.licenseNumber;
+    driver.phone = phone || driver.phone;
+
+    const updatedDriver = await driver.save();
+    
+    res.json({
+        _id: updatedDriver._id,
+        name: updatedDriver.name,
+        username: updatedDriver.username,
+        licenseNumber: updatedDriver.licenseNumber,
+        phone: updatedDriver.phone
+    });
+});
+
 // @desc    Delete a driver
 // @route   DELETE /api/fleetmanagers/drivers/:id
 // @access  Private
@@ -69,4 +102,4 @@ const deleteDriver = asyncHandler(async (req, res) => {
     res.status(200).json({ id: req.params.id });
 });
 
-export { createDriver, getMyDrivers, deleteDriver };
+export { createDriver, getMyDrivers, deleteDriver, updateDriver };

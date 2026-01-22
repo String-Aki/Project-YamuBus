@@ -19,6 +19,7 @@ import axios from "axios";
 import AddBusModal from "../components/buses/AddBusModal.jsx";
 import BusDetailsModal from "../components/buses/BusDetailsModal.jsx";
 import AddDriverModal from "../components/drivers/AddDriverModal.jsx";
+import DriverDetailsModal from "../components/drivers/DriverDetailsModal.jsx";
 
 const FleetDashboard = () => {
   const [user, setUser] = useState(null);
@@ -30,6 +31,7 @@ const FleetDashboard = () => {
   const [selectedBus, setSelectedBus] = useState(null);
   const [isAddBusOpen, setIsAddBusOpen] = useState(false);
   const [isAddDriverOpen, setIsAddDriverOpen] = useState(false);
+  const [selectedDriver, setSelectedDriver] = useState(null);
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
@@ -100,6 +102,17 @@ const FleetDashboard = () => {
 
   const handleDriverAdded = (newDriver) => {
     setDrivers([newDriver, ...drivers]);
+  };
+
+  const handleDriverUpdated = (updatedDriver) => {
+    setDrivers(
+      drivers.map((d) => (d._id === updatedDriver._id ? updatedDriver : d)),
+    );
+  };
+
+  const handleDriverDeleted = (driverId) => {
+    setDrivers(drivers.filter((d) => d._id !== driverId));
+    setSelectedDriver(null);
   };
 
   const handleDeleteDriver = async (driverId, e) => {
@@ -256,7 +269,8 @@ const FleetDashboard = () => {
             drivers.map((driver) => (
               <div
                 key={driver._id}
-                className="flex items-center justify-between bg-[#f8f8f8] p-4 rounded-[2rem] shadow-md mb-4 active:scale-95 transition-transform"
+                onClick={() => setSelectedDriver(driver)}
+                className="flex items-center justify-between bg-[#f8f8f8] p-4 rounded-[2rem] shadow-md mb-4 active:scale-95 transition-transform cursor-pointer"
               >
                 <div className="flex flex-col ml-2">
                   <h3 className="text-xl font-bold text-gray-800 mb-1">
@@ -270,13 +284,9 @@ const FleetDashboard = () => {
                     <span>{driver.licenseNumber}</span>
                   </div>
                 </div>
-                
-                <button
-                  onClick={(e) => handleDeleteDriver(driver._id, e)}
-                  className="bg-red-50 h-10 w-10 rounded-full flex items-center justify-center text-red-500 active:bg-red-100"
-                >
-                  <FaTrash className="text-sm" />
-                </button>
+                <div className="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center text-gray-600">
+                  <FaChevronRight className="text-sm" />
+                </div>
               </div>
             ))
           ) : (
@@ -312,6 +322,14 @@ const FleetDashboard = () => {
         isOpen={isAddDriverOpen}
         onClose={() => setIsAddDriverOpen(false)}
         onDriverAdded={handleDriverAdded}
+      />
+
+      <DriverDetailsModal
+        driver={selectedDriver}
+        isOpen={!!selectedDriver}
+        onClose={() => setSelectedDriver(null)}
+        onUpdate={handleDriverUpdated}
+        onDelete={handleDriverDeleted}
       />
     </div>
   );
