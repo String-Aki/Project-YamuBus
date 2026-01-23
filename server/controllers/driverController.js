@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import Driver from "../models/driver.js";
 import Trip from "../models/trip.js";
+import Bus from "../models/bus.js";
 import asyncHandler from "express-async-handler";
 
 const generateToken = (id) => {
@@ -113,7 +114,18 @@ const deleteDriver = asyncHandler(async (req, res) => {
 // @route   POST /api/drivers/login
 // @access  Public
 const loginDriver = asyncHandler(async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, busId } = req.body; 
+
+  if (!busId) {
+      res.status(400);
+      throw new Error('Device Error: No Bus ID found. Please re-bind device.');
+  }
+
+  const bus = await Bus.findById(busId);
+  if (!bus) {
+      res.status(404);
+      throw new Error('Bus not found');
+  }
 
   const driver = await Driver.findOne({ username });
 
@@ -124,14 +136,24 @@ const loginDriver = asyncHandler(async (req, res) => {
         throw new Error('Driver account is inactive');
     }
 
+    if (driver.fleetManager.toString() !== bus.fleetManager.toString()) {
+        res.status(403);
+        throw new Error('SECURITY ALERT: You are not authorized to operate this bus.');
+    }
+
     const activeTrip = await Trip.findOne({ 
         driver: driver._id, 
         status: 'active' 
     }).populate('bus', 'licensePlate');
 
+    if (activeTrip && activeTrip.bus._id.toString() !== busId) {
+         res.status(400);
+         throw new Error(`You have an active trip on another bus (${activeTrip.bus.licensePlate}). End that first.`);
+    }
+
     if (activeTrip) {
         res.status(400);
-        throw new Error(`You are already active on bus ${activeTrip.bus.licensePlate}. End that trip first.`);
+        throw new Error(`You are already active on this bus. Resume your trip.`);
     }
 
     res.json({

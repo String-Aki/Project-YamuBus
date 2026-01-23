@@ -38,7 +38,8 @@ const Login = () => {
         
         const { data } = await axios.post(`${API_URL}/drivers/login`, {
             username: credentials.u,
-            password: credentials.p
+            password: credentials.p,
+            busId: busId
         });
 
         localStorage.setItem('driverInfo', JSON.stringify(data));
