@@ -6,6 +6,8 @@ import { auth, storage } from '../firebase.js';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const InputField = ({ type, name, placeholder, value, icon, toggleIcon, onChange }) => (
   <div className="relative w-full mb-3">
     <input 
@@ -98,7 +100,7 @@ const CreateAccount = () => {
       const frontURL = await getDownloadURL(frontSnapshot.ref);
       const backURL = await getDownloadURL(backSnapshot.ref);
 
-      await axios.post('http://localhost:5000/api/fleetmanagers/register', {
+      await axios.post(`${API_URL}/fleetmanagers/register`, {
         fullName: formData.fullName,
         companyName: formData.companyName,
         contactEmail: formData.email,

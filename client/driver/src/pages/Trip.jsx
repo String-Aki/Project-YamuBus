@@ -5,6 +5,7 @@ import { io } from 'socket.io-client';
 import { FaStopCircle, FaClock, FaSatelliteDish,FaTachometerAlt,FaMapMarkerAlt  } from 'react-icons/fa';
 
 const socket = io(import.meta.env.VITE_API_URL);
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Trip = () => {
   const navigate = useNavigate();
@@ -101,7 +102,7 @@ const Trip = () => {
             navigator.geolocation.clearWatch(watchId.current);
         }
         
-        await axios.post(import.meta.env.VITE_API_URL+'/trips/end', 
+        await axios.post(`${API_URL}/trips/end`, 
             { tripId }, 
             { headers: { Authorization: `Bearer ${driverData.token}` } }
         );
@@ -154,17 +155,14 @@ const Trip = () => {
             </div>
         </div>
 
-        {/* 👇 NEW: LIVE TELEMETRY DISPLAY 👇 */}
         <div className="w-full grid grid-cols-2 gap-4">
-            
-            {/* Speedometer */}
+
             <div className="bg-[#1a1d21] border border-gray-800 rounded-2xl p-4 flex flex-col items-center justify-center">
                 <FaTachometerAlt className="text-blue-500 text-xl mb-2" />
                 <div className="text-3xl font-mono font-bold text-white">{telemetry.speed}</div>
                 <div className="text-[10px] text-gray-500 uppercase tracking-wider">km/h</div>
             </div>
-
-            {/* Coordinates */}
+            
             <div className="bg-[#1a1d21] border border-gray-800 rounded-2xl p-4 flex flex-col items-center justify-center">
                 <FaMapMarkerAlt className="text-purple-500 text-xl mb-2" />
                 <div className="text-xs font-mono text-gray-300">
