@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -7,8 +6,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-brown': '#A0522D', 
-        'brand-dark': '#252b31',
+        brand: {
+          DEFAULT: '#2563eb',
+          dark: '#1e40af'
+        }
       }
     },
   },

@@ -51,10 +51,18 @@ const endTrip = asyncHandler(async (req, res) => {
 
     trip.status = 'completed';
     trip.endTime = Date.now();
-    
     await trip.save();
 
-    res.json({ message: "Trip ended successfully" });
+    const io = req.app.get('io');
+  if (io) {
+      console.log(`📢 TRIPS: Bus ${trip.bus} went offline.`); //
+
+      io.emit('busOffline', { busId: trip.bus.toString() });
+  } else {
+      console.log("⚠️ Socket.io not found in request!");//
+  }
+
+    res.status(200).json(trip);
 });
 
 export { startTrip, endTrip };

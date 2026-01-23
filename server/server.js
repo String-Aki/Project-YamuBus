@@ -15,6 +15,8 @@ dotenv.config();
 connectDB();
 const app = express();
 
+let activeFleet = {};
+
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
@@ -23,9 +25,10 @@ const io = new Server(httpServer, {
   },
 });
 
+app.set('io', io);
+
 app.use(cors());
 app.use(express.json());
-
 
 app.get("/", (req, res) => {
   res.send("Bus Tracking App Is Running");
@@ -36,16 +39,32 @@ app.use("/api/drivers", driverRoutes);
 app.use("/api/trips", tripRoutes);
 app.use("/api/routes", routeRoutes);
 
-io.on('connection', (socket) => {
-  console.log('A user connected:', socket.id);
+io.on("connection", (socket) => {
+  console.log("A user connected:", socket.id);
 
-  socket.on('driverLocation', (data) => {
-    io.emit('busUpdate', data);    
+  const currentBuses = Object.values(activeFleet);
+  if (currentBuses.length > 0) {
+    socket.emit("initialFleetState", currentBuses);
+  }
+
+  socket.on("driverLocation", (data) => {
+    console.log("📢 SERVER HEARD DRIVER:", data.busPlate, "at", data.lat, data.lng);
+    const busData = {
+      ...data, // Contains: busId, lat, lng, speed, routeNo, destination
+      lastUpdated: Date.now(),
+    };
+
+    // Save to Memory
+    activeFleet[data.busId] = busData;
+
+    console.log("📡 BROADCASTING TO PASSENGERS...");
+
+    io.emit("busUpdate", data);
     console.log(`Bus ${data.busPlate} moved to ${data.lat}, ${data.lng}`);
   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
+  socket.on("disconnect", () => {
+    console.log("User disconnected");
   });
 });
 
