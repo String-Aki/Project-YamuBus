@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -16,7 +15,6 @@ export default defineConfig({
         theme_color: "#1a1d21",
         background_color: "#1a1d21",
         display: "standalone",
-        orientation: "portrait",
         start_url: "/",
         icons: [
           {
@@ -38,25 +36,6 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
-        screenshots: [
-          {
-            src: "screenshot-mobile.png",
-            sizes: "540x720",
-            type: "image/png",
-            label: "Mobile View Example",
-          },
-          {
-            src: "screenshot-desktop.png",
-            sizes: "1280x720",
-            type: "image/png",
-            form_factor: "wide",
-            label: "Desktop View Example",
-          },
-        ],
-      },
-      devOptions: {
-        enabled: true,
-        type: "module",
       },
     }),
   ],

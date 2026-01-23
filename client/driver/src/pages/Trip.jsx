@@ -4,8 +4,9 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { FaStopCircle, FaClock, FaSatelliteDish,FaTachometerAlt,FaMapMarkerAlt  } from 'react-icons/fa';
 
-const socket = io(import.meta.env.VITE_API_URL);
+const socket = io(import.meta.env.VITE_SOCKET_URL);
 const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = 'http://localhost:5000/api';
 
 const Trip = () => {
   const navigate = useNavigate();
@@ -42,7 +43,13 @@ const Trip = () => {
 
         const geoSuccess = (position) => {
             const { latitude, longitude, speed, heading } = position.coords;
-            console.log(`📡 GPS Fix: ${latitude}, ${longitude}`);
+            console.log(`📡 GPS Fix: ${latitude}, ${longitude}`); //Remove on production
+
+            const routeString = localStorage.getItem('MOUNTED_ROUTE_INFO') || "Unknown - Unknown";
+
+            const parts = routeString.split(' - '); 
+            const originStr = parts[0] ? parts[0].trim() : "Unknown";
+            const destStr = parts[1] ? parts[1].trim() : "Unknown";
 
             setTelemetry({
                 lat: latitude.toFixed(5),
@@ -57,7 +64,11 @@ const Trip = () => {
                 lat: latitude,
                 lng: longitude,
                 speed: speed || 0,
-                heading: heading || 0
+                heading: heading || 0,
+
+                routeNo: "Express", // Or you can pass a hardcoded value/get it from elsewhere
+                origin: originStr,
+                destination: destStr
             });
         };
 
