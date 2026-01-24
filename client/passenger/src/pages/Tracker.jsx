@@ -79,6 +79,25 @@ const Tracker = () => {
       </div>
     );
 
+  const handleShare = async () => {
+    const shareData = {
+      title: `Track Bus ${busData.routeNo}`,
+      text: `I am tracking the ${busData.routeNo} bus to ${busData.destination}. Watch it live here:`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Tracking link copied to clipboard!");
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   return (
     <div className="relative w-full h-screen bg-gray-100 overflow-hidden">
       <button
@@ -176,7 +195,10 @@ const Tracker = () => {
             </div>
           </div>
 
-          <button className="w-full mt-6 bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all">
+          <button
+            className="w-full mt-6 bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
+            onClick={handleShare}
+          >
             Share Trip
           </button>
         </div>
