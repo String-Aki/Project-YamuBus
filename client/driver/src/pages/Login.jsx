@@ -70,34 +70,57 @@ const Login = () => {
 
   const handleLogin = async (qrData) => {
     setLoading(true);
-    setError("");
+    setError('');
 
     try {
-      let credentials;
-      try {
-        credentials = JSON.parse(qrData);
-      } catch (e) {
-        throw new Error("Invalid QR Format. Not a JSON badge.");
-      }
+        let credentials;
+        try {
+            credentials = JSON.parse(qrData);
+        } catch (e) {
+            throw new Error("Bad QR: This is not a valid Driver Badge.");
+        }
 
-      if (!credentials.u || !credentials.p) {
-        throw new Error("Invalid Badge: Missing credentials.");
-      }
+        if (!credentials.u || !credentials.p) {
+            throw new Error("Incomplete Badge: Missing name or ID.");
+        }
 
-      const busId = localStorage.getItem("MOUNTED_BUS_ID");
+        const busId = localStorage.getItem('MOUNTED_BUS_ID');
+        
+        const { data } = await axios.post(`${API_URL}/drivers/login`, {
+            username: credentials.u,
+            password: credentials.p,
+            busId: busId
+        });
 
-      const { data } = await axios.post(`${API_URL}/drivers/login`, {
-        username: credentials.u,
-        password: credentials.p,
-        busId: busId,
-      });
+        localStorage.setItem('driverInfo', JSON.stringify(data));
+        navigate('/dashboard');
 
-      localStorage.setItem("driverInfo", JSON.stringify(data));
-      navigate("/dashboard");
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Login Failed. Check connection.");
-      setLoading(false);
+        console.error(err);
+        
+        // 👇 SMART ERROR TRANSLATOR 👇
+        let friendlyMsg = "Login failed. Please try again.";
+
+        if (err.response) {
+            // The Server answered, but with an error code
+            const status = err.response.status;
+            
+            if (status === 400) friendlyMsg = "Invalid Badge Data. Please rescan.";
+            if (status === 401) friendlyMsg = "Wrong Badge! Access Denied.";
+            if (status === 403) friendlyMsg = "You are not authorized for this specific bus.";
+            if (status === 404) friendlyMsg = "Driver account not found.";
+            if (status === 500) friendlyMsg = "Server is having trouble. Try again later.";
+        
+        } else if (err.request) {
+            // The Server didn't answer (Network Issue)
+            friendlyMsg = "No Internet! Check your data connection.";
+        } else {
+            // It was a code error (like the JSON parse above)
+            friendlyMsg = err.message;
+        }
+
+        setError(friendlyMsg);
+        setLoading(false);
     }
   };
 
