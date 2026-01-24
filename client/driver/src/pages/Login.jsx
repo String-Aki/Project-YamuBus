@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Html5Qrcode } from "html5-qrcode"; // 👈 Using Core Library, not Scanner
+import { Html5Qrcode } from "html5-qrcode";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,8 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const Login = () => {
   const navigate = useNavigate();
-
-  // State
+  
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -98,11 +97,9 @@ const Login = () => {
     } catch (err) {
         console.error(err);
         
-        // 👇 SMART ERROR TRANSLATOR 👇
         let friendlyMsg = "Login failed. Please try again.";
 
         if (err.response) {
-            // The Server answered, but with an error code
             const status = err.response.status;
             
             if (status === 400) friendlyMsg = "Invalid Badge Data. Please rescan.";
@@ -112,10 +109,8 @@ const Login = () => {
             if (status === 500) friendlyMsg = "Server is having trouble. Try again later.";
         
         } else if (err.request) {
-            // The Server didn't answer (Network Issue)
             friendlyMsg = "No Internet! Check your data connection.";
         } else {
-            // It was a code error (like the JSON parse above)
             friendlyMsg = err.message;
         }
 
