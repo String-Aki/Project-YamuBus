@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigation } from 'lucide-react';
+import { Navigation, MapPin } from 'lucide-react';
 
 const BusCard = ({ bus, onClick }) => {
   return (
@@ -21,15 +21,25 @@ const BusCard = ({ bus, onClick }) => {
             <span className="text-2xl font-black leading-none">{bus.routeNo || "000"}</span>
         </div>
 
-        <div className="flex-1">
+        <div className="flex-1 pr-8"> 
             <h3 className="text-xl font-bold text-gray-800 leading-tight">
                 {bus.destination || "Unknown"}
             </h3>
             
             <div className="flex items-center gap-2 mt-1 text-gray-500 text-sm font-medium">
-                <span className="bg-gray-100 px-2 py-0.5 rounded text-xs text-gray-600">
-                    From: {bus.origin}
-                </span>
+                 {bus.distance !== null && bus.distance !== undefined ? (
+                    <span className="text-blue-600 flex items-center gap-1 bg-blue-50 px-2 py-0.5 rounded text-xs font-bold">
+                        <MapPin size={10} />
+                        {bus.distance < 1000 
+                            ? `${Math.round(bus.distance)} m away`
+                            : `${(bus.distance / 1000).toFixed(1)} km away`
+                        }
+                    </span>
+                 ) : (
+                    <span className="bg-gray-100 px-2 py-0.5 rounded text-xs text-gray-600">
+                        From: {bus.origin}
+                    </span>
+                 )}
             </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
+import { getDistance } from "geolib";
 import { Bus, Search, Map, Navigation } from "lucide-react";
 import BusCard from "../components/BusCard";
 
@@ -10,6 +11,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [activeBuses, setActiveBuses] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
     const SERVER_URL = import.meta.env.VITE_SOCKET_URL;
@@ -55,6 +57,19 @@ const Home = () => {
       });
     });
 
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude, 
+          });
+        },
+        (error) => console.log("Location error:", error),
+        { enableHighAccuracy: true },
+      );
+    }
+
     return () => {
       console.log("🔌 Disconnecting...");
       socket.disconnect();
@@ -62,16 +77,34 @@ const Home = () => {
     };
   }, []);
 
-  const buses = Object.values(activeBuses);
+  const buses = Object.values(activeBuses).map((bus) => {
+    let distInMeters = null;
 
-  const filteredBuses = buses.filter((bus) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      (bus.routeNo || "").toLowerCase().includes(term) ||
-      (bus.destination || "").toLowerCase().includes(term) ||
-      (bus.origin || "").toLowerCase().includes(term)
-    );
+    if (userLocation && bus.lat && bus.lng) {
+      distInMeters = getDistance(
+        userLocation,
+        { latitude: bus.lat, longitude: bus.lng },
+      );
+    }
+
+    return { ...bus, distance: distInMeters };
   });
+
+  const filteredBuses = buses
+    .filter((bus) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        (bus.routeNo || "").toLowerCase().includes(term) ||
+        (bus.destination || "").toLowerCase().includes(term) ||
+        (bus.origin || "").toLowerCase().includes(term)
+      );
+    })
+    .sort((a, b) => {
+      if (a.distance !== null && b.distance !== null) {
+        return a.distance - b.distance;
+      }
+      return 0;
+    });
 
   return (
     <div className="min-h-screen bg-slate-50 pb-20">
