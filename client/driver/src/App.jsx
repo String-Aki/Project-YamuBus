@@ -5,39 +5,62 @@ import SetupBus from './pages/SetupBus';
 import Dashboard from './pages/Dashboard';
 import Trip from './pages/Trip'
 
-const ProtectedRoute = ({ children }) => {
+const RequireSetup = ({ children }) => {
     const busId = localStorage.getItem('MOUNTED_BUS_ID');
+    
     if (!busId) {
+        console.log("Bus not set up. Redirecting to /setup");
         return <Navigate to="/setup" replace />;
     }
+    
+    return children;
+};
+
+const PreventReSetup = ({ children }) => {
+    const busId = localStorage.getItem('MOUNTED_BUS_ID');
+    
+    if (busId) {
+        console.log("Bus already set up. Skipping setup screen...");
+        return <Navigate to="/trip" replace />; 
+    }
+    
     return children;
 };
 
 const App = () => {
+  
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/setup" element={<SetupBus />} />
+        {/* 1. SETUP PAGE (Protected against re-entry) */}
+        <Route path="/setup" element={
+            <PreventReSetup>
+                <SetupBus />
+            </PreventReSetup>
+        } />
 
+        {/* 2. PROTECTED PAGES (Require Bus ID to exist) */}
         <Route path="/login" element={
-            <ProtectedRoute>
+            <RequireSetup>
                 <Login />
-            </ProtectedRoute>
+            </RequireSetup>
         } />
 
         <Route path="/dashboard" element={
-            <ProtectedRoute>
+            <RequireSetup>
                   <Dashboard />
-            </ProtectedRoute>
+            </RequireSetup>
         } />
 
         <Route path="/trip" element={
-            <ProtectedRoute>
+            <RequireSetup>
                  <Trip />
-            </ProtectedRoute>
+            </RequireSetup>
         } />
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/trip" replace />} />
+
+        <Route path="*" element={<Navigate to="/trip" replace />} />
       </Routes>
     </BrowserRouter>
   );
