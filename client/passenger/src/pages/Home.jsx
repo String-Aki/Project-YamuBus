@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
-import { Bus, MapPin, Navigation } from "lucide-react";
+import { Bus, Search, Map, Navigation } from "lucide-react";
+import BusCard from "../components/BusCard";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const navigate = useNavigate();
   const [activeBuses, setActiveBuses] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const SERVER_URL = import.meta.env.VITE_SOCKET_URL;
@@ -62,69 +64,66 @@ const Home = () => {
 
   const buses = Object.values(activeBuses);
 
-  return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      <div className="bg-brand text-white p-6 rounded-b-3xl shadow-lg">
-        <h1 className="text-2xl font-bold">Where to?</h1>
-        <p className="text-blue-100 text-sm">Track your bus in real-time</p>
+  const filteredBuses = buses.filter((bus) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      (bus.routeNo || "").toLowerCase().includes(term) ||
+      (bus.destination || "").toLowerCase().includes(term) ||
+      (bus.origin || "").toLowerCase().includes(term)
+    );
+  });
 
-        <div className="mt-4 bg-white/20 backdrop-blur-md p-3 rounded-xl flex items-center gap-3">
-          <Navigation className="text-white" size={20} />
-          <input
-            type="text"
-            placeholder="Search route (e.g. 177)..."
-            className="bg-transparent text-white placeholder-blue-200 outline-none w-full"
-          />
+  return (
+    <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="bg-blue-700 pt-12 pb-24 px-6 rounded-b-[40px] shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600 rounded-full -mr-16 -mt-16 opacity-50"></div>
+
+        <div className="relative z-10">
+          <h1 className="text-3xl font-black text-white mb-1">
+            Find your bus.
+          </h1>
+          <p className="text-blue-100 mb-6">Real-time tracking for Sri Lanka</p>
+
+          <div className="bg-white p-2 rounded-2xl shadow-lg flex items-center gap-3">
+            <div className="bg-blue-50 p-2 rounded-xl text-blue-600">
+              <Search size={20} />
+            </div>
+            <input
+              type="text"
+              placeholder="Search Route (e.g. 177, Kandy)..."
+              className="flex-1 bg-transparent outline-none text-gray-700 font-medium placeholder-gray-400"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="p-6">
-        <h2 className="font-bold text-gray-700 mb-4 flex items-center gap-2">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-          Live Now ({buses.length})
-        </h2>
+      <div className="px-6 -mt-16 relative z-20">
+        <div className="flex justify-between items-end mb-4 px-2">
+          <h2 className="font-bold text-gray-800 text-lg">
+            Live Now{" "}
+            <span className="text-gray-400 text-sm font-normal">
+              ({filteredBuses.length})
+            </span>
+          </h2>
+        </div>
 
-        <div className="space-y-4">
-          {buses.length === 0 ? (
-            <div className="text-center text-gray-400 py-10">
-              <Bus className="mx-auto mb-2 opacity-20" size={48} />
-              <p>No buses are running right now.</p>
+        <div className="space-y-1">
+          {filteredBuses.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
+              <div className="animate-pulse mb-2">📡</div>
+              <p className="text-gray-400">No active buses found.</p>
             </div>
           ) : (
-            buses.map((bus) => (
-              <div
+            filteredBuses.map((bus) => (
+              <BusCard
                 key={bus.busId}
+                bus={bus}
                 onClick={() =>
                   navigate(`/track/${bus.busId}`, { state: { busData: bus } })
                 }
-                className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center cursor-pointer hover:shadow-md transition-all active:scale-95"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="bg-brand text-white w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm shadow-md text-center leading-tight p-1">
-                    {bus.routeNo || "Bus"}
-                  </div>
-
-                  <div>
-                    <h3 className="font-bold text-gray-800 text-lg leading-tight">
-                      {bus.destination || "Unknown"}
-                    </h3>
-
-                    <p className="text-xs text-gray-500 font-medium flex items-center gap-1">
-                      From: <span className="font-semibold">{bus.origin}</span>{" "}
-                      • {bus.busPlate}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <span className="block font-mono font-bold text-brand">
-                    {Math.round(bus.speed * 3.6)}
-                  </span>
-                  <span className="text-[10px] text-gray-400 uppercase">
-                    km/h
-                  </span>
-                </div>
-              </div>
+              />
             ))
           )}
         </div>
