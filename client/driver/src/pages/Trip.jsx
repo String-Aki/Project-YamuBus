@@ -108,6 +108,7 @@ const Trip = () => {
 
     try {
         const driverData = JSON.parse(localStorage.getItem('driverInfo'));
+        const busId = localStorage.getItem('MOUNTED_BUS_ID');
 
         if (watchId.current !== null) {
             navigator.geolocation.clearWatch(watchId.current);
@@ -117,6 +118,10 @@ const Trip = () => {
             { tripId }, 
             { headers: { Authorization: `Bearer ${driverData.token}` } }
         );
+
+        if (busId) {
+            socket.emit('tripEnded', busId);
+        }
 
         localStorage.removeItem('CURRENT_TRIP_ID');
         if (watchId.current) navigator.geolocation.clearWatch(watchId.current);
