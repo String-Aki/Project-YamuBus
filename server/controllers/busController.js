@@ -8,6 +8,11 @@ import Route from "../models/route.js";
 // @route   POST /api/fleetmanagers/buses
 // @access  Private
 const createBus = asyncHandler(async (req, res) => {
+  
+  if (req.user.status !== 'approved') {
+        res.status(403);
+        throw new Error("Account pending approval. You cannot add buses yet.");
+    }
   const { licensePlate, route } = req.body;
 
   if (!licensePlate || !route) {

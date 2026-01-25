@@ -12,6 +12,12 @@ const generateToken = (id) => {
 // @route   POST /api/fleetmanagers/drivers
 // @access  Private
 const createDriver = asyncHandler(async (req, res) => {
+
+  if (req.user.status !== 'approved') {
+        res.status(403);
+        throw new Error("Account pending approval. You cannot add drivers yet.");
+    }
+
   const { name, licenseNumber, phone, username, password } = req.body;
 
   if (!name || !licenseNumber || !phone || !username || !password) {

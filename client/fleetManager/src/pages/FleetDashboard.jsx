@@ -115,26 +115,6 @@ const FleetDashboard = () => {
     setSelectedDriver(null);
   };
 
-  const handleDeleteDriver = async (driverId, e) => {
-    e.stopPropagation();
-    if (
-      !window.confirm(
-        "Delete this driver? They will no longer be able to log in.",
-      )
-    )
-      return;
-
-    try {
-      const token = await auth.currentUser.getIdToken();
-      await axios.delete(`${API_URL}/fleetmanagers/drivers/${driverId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setDrivers(drivers.filter((d) => d._id !== driverId));
-    } catch (error) {
-      alert("Failed to delete driver");
-    }
-  };
-
   if (loading)
     return (
       <div className="flex h-screen items-center justify-center bg-brand-brown text-white font-bold">
