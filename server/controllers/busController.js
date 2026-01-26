@@ -1,18 +1,17 @@
 import asyncHandler from "express-async-handler";
-import admin from '../config/firebaseAdmin.js'
+import admin from "../config/firebaseAdmin.js";
 import Bus from "../models/bus.js";
 import FleetManager from "../models/fleetmanager.js";
 import Route from "../models/route.js";
 
-// @desc    Add a new bus
-// @route   POST /api/fleetmanagers/buses
-// @access  Private
+// @desc Add a new bus
+// @route POST /api/fleetmanagers/buses
+// @access Private
 const createBus = asyncHandler(async (req, res) => {
-  
-  if (req.user.status !== 'approved') {
-        res.status(403);
-        throw new Error("Account pending approval. You cannot add buses yet.");
-    }
+  if (req.user.status !== "approved") {
+    res.status(403);
+    throw new Error("Account pending approval. You cannot add buses yet.");
+  }
   const { licensePlate, route } = req.body;
 
   if (!licensePlate || !route) {
@@ -46,9 +45,9 @@ const getMyBuses = asyncHandler(async (req, res) => {
   res.status(200).json(buses);
 });
 
-// @desc    Update bus details (Plate or Route)
-// @route   PUT /api/fleetmanagers/buses/:id
-// @access  Private
+// @desc Update bus details (Plate or Route)
+// @route PUT /api/fleetmanagers/buses/:id
+// @access Private
 const updateBus = asyncHandler(async (req, res) => {
   const bus = await Bus.findById(req.params.id);
 
@@ -69,9 +68,9 @@ const updateBus = asyncHandler(async (req, res) => {
   res.status(200).json(updatedBus);
 });
 
-// @desc    Delete a bus
-// @route   DELETE /api/fleetmanagers/buses/:id
-// @access  Private
+// @desc Delete a bus
+// @route DELETE /api/fleetmanagers/buses/:id
+// @access Private
 const deleteBus = asyncHandler(async (req, res) => {
   const bus = await Bus.findById(req.params.id);
 
@@ -89,36 +88,36 @@ const deleteBus = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
-// @desc    Get buses for device setup
-// @route   POST /api/fleetmanagers/setup/buses
-// @access  Public
+// @desc Get buses for device setup
+// @route POST /api/fleetmanagers/setup/buses
+// @access Public
 const getBusesForSetup = asyncHandler(async (req, res) => {
-    const { idToken } = req.body;
+  const { idToken } = req.body;
 
-    if (!idToken) {
-        res.status(401);
-        throw new Error("No token provided");
+  if (!idToken) {
+    res.status(401);
+    throw new Error("No token provided");
+  }
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const email = decodedToken.email;
+    const manager = await FleetManager.findOne({ contactEmail: email });
+    if (!manager) {
+      res.status(404);
+      throw new Error("Manager not found in database");
     }
 
-    try {
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
-        const email = decodedToken.email;
-        const manager = await FleetManager.findOne({ contactEmail: email });
-        if (!manager) {
-            res.status(404);
-            throw new Error("Manager not found in database");
-        }
+    const buses = await Bus.find({ fleetManager: manager._id }).select(
+      "licensePlate _id route status",
+    );
 
-        const buses = await Bus.find({ fleetManager: manager._id })
-        .select('licensePlate _id route status');
-
-        res.json(buses);
-
-    } catch (error) {
-        console.error("Firebase Auth Error:", error);
-        res.status(401);
-        throw new Error("Invalid or Expired Token");
-    }
+    res.json(buses);
+  } catch (error) {
+    console.error("Firebase Auth Error:", error);
+    res.status(401);
+    throw new Error("Invalid or Expired Token");
+  }
 });
 
 export { createBus, getMyBuses, updateBus, deleteBus, getBusesForSetup };

@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        'driver-dark': '#1a1d21', // Darker theme for driver app (easier on eyes at night)
-        'driver-accent': '#3b82f6', // Blue for "Action"
+        'driver-dark': '#1a1d21',
+        'driver-accent': '#3b82f6',
       },
       animation: {
         'scan-line': 'scan 2s linear infinite',

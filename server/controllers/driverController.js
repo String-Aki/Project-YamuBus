@@ -4,9 +4,9 @@ import Bus from "../models/bus.js";
 import asyncHandler from "express-async-handler";
 import generateToken from "../utils/generateToken.js";
 
-// @desc    Register a new driver
-// @route   POST /api/fleetmanagers/drivers
-// @access  Private
+// @desc Register a new driver
+// @route POST /api/fleetmanagers/drivers
+// @access Private
 const createDriver = asyncHandler(async (req, res) => {
 
   if (req.user.status !== 'approved') {
@@ -50,9 +50,9 @@ const createDriver = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get all my drivers
-// @route   GET /api/fleetmanagers/drivers
-// @access  Private
+// @desc Get all my drivers
+// @route GET /api/fleetmanagers/drivers
+// @access Private
 const getMyDrivers = asyncHandler(async (req, res) => {
   const drivers = await Driver.find({ fleetManager: req.user._id }).select(
     "-password",
@@ -60,9 +60,9 @@ const getMyDrivers = asyncHandler(async (req, res) => {
   res.status(200).json(drivers);
 });
 
-// @desc    Update driver details
-// @route   PUT /api/fleetmanagers/drivers/:id
-// @access  Private
+// @desc Update driver details
+// @route PUT /api/fleetmanagers/drivers/:id
+// @access Private
 const updateDriver = asyncHandler(async (req, res) => {
   const { name, licenseNumber, phone } = req.body;
   const driver = await Driver.findById(req.params.id);
@@ -92,9 +92,9 @@ const updateDriver = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete a driver
-// @route   DELETE /api/fleetmanagers/drivers/:id
-// @access  Private
+// @desc Delete a driver
+// @route DELETE /api/fleetmanagers/drivers/:id
+// @access Private
 const deleteDriver = asyncHandler(async (req, res) => {
   const driver = await Driver.findById(req.params.id);
 
@@ -112,9 +112,9 @@ const deleteDriver = asyncHandler(async (req, res) => {
   res.status(200).json({ id: req.params.id });
 });
 
-// @desc    Auth Driver & get token
-// @route   POST /api/drivers/login
-// @access  Public
+// @desc Auth Driver & get token
+// @route POST /api/drivers/login
+// @access Public
 const loginDriver = asyncHandler(async (req, res) => {
   const { username, password, busId } = req.body; 
 

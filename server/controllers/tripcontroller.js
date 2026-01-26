@@ -2,9 +2,9 @@ import Trip from '../models/trip.js';
 import Bus from '../models/bus.js'; 
 import asyncHandler from 'express-async-handler';
 
-// @desc    Start a new trip
-// @route   POST /api/trips/start
-// @access  Private 
+// @desc Start a new trip
+// @route POST /api/trips/start
+// @access Private 
 const startTrip = asyncHandler(async (req, res) => {
     const { busId } = req.body;
     const driverId = req.user._id;
@@ -36,9 +36,9 @@ const startTrip = asyncHandler(async (req, res) => {
     res.status(201).json(trip);
 });
 
-// @desc    End the current trip
-// @route   POST /api/trips/end
-// @access  Private
+// @desc End the current trip
+// @route POST /api/trips/end
+// @access Private
 const endTrip = asyncHandler(async (req, res) => {
     const driverId = req.user._id;
 
@@ -55,11 +55,11 @@ const endTrip = asyncHandler(async (req, res) => {
 
     const io = req.app.get('io');
   if (io) {
-      console.log(`📢 TRIPS: Bus ${trip.bus} went offline.`); //
+      console.log(`📢 TRIPS: Bus ${trip.bus} went offline.`); // Remove on deployment
 
       io.emit('busOffline', { busId: trip.bus.toString() });
   } else {
-      console.log("⚠️ Socket.io not found in request!");//
+      console.log("⚠️ Socket.io not found in request!");// Remove on deployment
   }
 
     res.status(200).json(trip);

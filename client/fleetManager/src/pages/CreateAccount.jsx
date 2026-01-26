@@ -143,10 +143,8 @@ const CreateAccount = () => {
         </div>
       </div>
 
-      {/* CARD */}
       <div className="flex-1 bg-brand-dark rounded-tl-[3rem] px-6 py-6 flex flex-col items-center w-full">
         
-        {/* STEPPER */}
         <div className="flex gap-6 mb-6 flex-none">
           {[1, 2, 3].map((step) => (
             <div key={step} className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${currentStep === step ? 'bg-brand-brown text-white shadow-lg' : 'bg-gray-200 text-gray-600'}`}>
@@ -154,8 +152,7 @@ const CreateAccount = () => {
             </div>
           ))}
         </div>
-
-        {/* Stepper FORM */}
+        
         <div className="w-full flex-1 overflow-y-auto custom-scrollbar pr-1">
 
           {currentStep === 1 && (

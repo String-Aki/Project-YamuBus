@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs"; // We need this to encrypt their passwords
+import bcrypt from "bcryptjs";
 
 const driverSchema = mongoose.Schema(
   {
@@ -27,7 +27,7 @@ const driverSchema = mongoose.Schema(
     username: {
       type: String,
       required: true,
-      unique: true, // Must be unique across the whole system
+      unique: true,
       trim: true,
       lowercase: true
     },
@@ -35,7 +35,6 @@ const driverSchema = mongoose.Schema(
       type: String,
       required: true
     },
-    // -------------------------
     status: {
       type: String,
       enum: ['active', 'inactive'],
@@ -47,7 +46,6 @@ const driverSchema = mongoose.Schema(
   }
 );
 
-// Encrypt password before saving
 driverSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
@@ -56,7 +54,6 @@ driverSchema.pre('save', async function (next) {
   this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Helper to check password later (during login)
 driverSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
