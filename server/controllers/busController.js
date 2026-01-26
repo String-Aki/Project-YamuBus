@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 import admin from "../config/firebaseAdmin.js";
 import Bus from "../models/bus.js";
 import FleetManager from "../models/fleetmanager.js";
-import Route from "../models/route.js";
+// import Route from "../models/route.js";
 
 // @desc Add a new bus
 // @route POST /api/fleetmanagers/buses
