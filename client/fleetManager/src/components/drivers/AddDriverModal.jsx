@@ -11,7 +11,7 @@ import {
   FaPrint,
   FaCheckCircle,
 } from "react-icons/fa";
-import { auth } from "../../firebase";
+import { auth } from "../../config/firebase.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

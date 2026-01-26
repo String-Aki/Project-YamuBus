@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../firebase'; 
+import { auth } from '../config/firebase.js'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 

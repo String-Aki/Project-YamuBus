@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { FaArrowLeft, FaEye, FaEyeSlash, FaCamera } from 'react-icons/fa';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, storage } from '../firebase.js'; 
+import { auth, storage } from '../config/firebase'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 

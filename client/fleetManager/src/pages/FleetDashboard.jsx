@@ -12,7 +12,7 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
+import { auth } from "../config/firebase.js";
 import { signOut } from "firebase/auth";
 import axios from "axios";
 
