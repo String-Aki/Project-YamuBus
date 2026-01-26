@@ -10,6 +10,7 @@ import fleetManagerRoutes from "./routes/fleetManagerRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import routeRoutes from "./routes/routeRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -37,6 +38,7 @@ app.get("/", (req, res) => {
 app.use("/api/fleetmanagers", fleetManagerRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/trips", tripRoutes);
+app.use('/api/admin', adminRoutes);
 app.use("/api/routes", routeRoutes);
 
 io.on("connection", (socket) => {

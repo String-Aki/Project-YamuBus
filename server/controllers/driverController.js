@@ -1,12 +1,8 @@
-import jwt from "jsonwebtoken";
 import Driver from "../models/driver.js";
 import Trip from "../models/trip.js";
 import Bus from "../models/bus.js";
 import asyncHandler from "express-async-handler";
-
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_Secret, { expiresIn: "30d" });
-};
+import generateToken from "../utils/generateToken.js";
 
 // @desc    Register a new driver
 // @route   POST /api/fleetmanagers/drivers
