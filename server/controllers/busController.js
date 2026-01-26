@@ -2,7 +2,6 @@ import asyncHandler from "express-async-handler";
 import admin from "../config/firebaseAdmin.js";
 import Bus from "../models/bus.js";
 import FleetManager from "../models/fleetmanager.js";
-// import Route from "../models/route.js";
 
 // @desc Add a new bus
 // @route POST /api/fleetmanagers/buses
@@ -12,26 +11,29 @@ const createBus = asyncHandler(async (req, res) => {
     res.status(403);
     throw new Error("Account pending approval. You cannot add buses yet.");
   }
-  const { licensePlate, route } = req.body;
+  const { plateNumber, route, registrationCertificate, routePermit } = req.body;
 
-  if (!licensePlate || !route) {
+  if (!plateNumber || !route || !registrationCertificate || !routePermit) {
     res.status(400);
-    throw new Error("Please provide license plate and route");
+    throw new Error("Please upload all required bus documents.");
   }
 
   const fleetManager = req.user;
 
-  const busExists = await Bus.findOne({ licensePlate });
+  const busExists = await Bus.findOne({ plateNumber });
   if (busExists) {
     res.status(400);
     throw new Error("Bus with this license plate already exists");
   }
 
   const bus = await Bus.create({
-    licensePlate,
     fleetManager: fleetManager._id,
+    plateNumber,
     route: route,
-    status: "offline",
+    registrationCertificate,
+    routePermit,
+    verificationStatus: "pending",
+    isActive: false,
   });
 
   res.status(201).json(bus);
@@ -41,31 +43,8 @@ const createBus = asyncHandler(async (req, res) => {
 // @route GET /api/fleetmanager/buses
 // @access Private
 const getMyBuses = asyncHandler(async (req, res) => {
-  const buses = await Bus.find({ fleetManager: req.user._id });
+  const buses = await Bus.find({ fleetManager: req.user._id }).sort({ createdAt: -1 });
   res.status(200).json(buses);
-});
-
-// @desc Update bus details (Plate or Route)
-// @route PUT /api/fleetmanagers/buses/:id
-// @access Private
-const updateBus = asyncHandler(async (req, res) => {
-  const bus = await Bus.findById(req.params.id);
-
-  if (!bus) {
-    res.status(404);
-    throw new Error("Bus not found");
-  }
-
-  if (bus.fleetManager.toString() !== req.user.id) {
-    res.status(401);
-    throw new Error("User not authorized");
-  }
-
-  bus.licensePlate = req.body.licensePlate || bus.licensePlate;
-  bus.route = req.body.route || bus.route;
-
-  const updatedBus = await bus.save();
-  res.status(200).json(updatedBus);
 });
 
 // @desc Delete a bus
@@ -102,14 +81,16 @@ const getBusesForSetup = asyncHandler(async (req, res) => {
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     const email = decodedToken.email;
+
     const manager = await FleetManager.findOne({ contactEmail: email });
     if (!manager) {
       res.status(404);
       throw new Error("Manager not found in database");
     }
 
-    const buses = await Bus.find({ fleetManager: manager._id }).select(
-      "licensePlate _id route status",
+    const buses = await Bus.find({ fleetManager: manager._id, verificationStatus: 'verified' 
+    }).select(
+      "plateNumber _id route",
     );
 
     res.json(buses);
@@ -120,4 +101,4 @@ const getBusesForSetup = asyncHandler(async (req, res) => {
   }
 });
 
-export { createBus, getMyBuses, updateBus, deleteBus, getBusesForSetup };
+export { createBus, getMyBuses, deleteBus, getBusesForSetup };

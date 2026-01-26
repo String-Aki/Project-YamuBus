@@ -6,7 +6,6 @@ import {
 import {
   createBus,
   getMyBuses,
-  updateBus,
   deleteBus,
   getBusesForSetup
 } from "../controllers/busController.js";
@@ -26,7 +25,6 @@ router.get("/me", protect, getMe);
 // Bus Routes
 router.post("/buses", protect, createBus);
 router.get("/buses", protect, getMyBuses);
-router.put("/buses/:id", protect, updateBus);
 router.delete("/buses/:id", protect, deleteBus);
 router.post("/setup/buses", getBusesForSetup);
 

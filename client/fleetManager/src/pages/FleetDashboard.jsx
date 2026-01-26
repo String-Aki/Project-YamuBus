@@ -10,6 +10,7 @@ import {
   FaIdCard,
   FaExclamationTriangle,
   FaTrash,
+  FaBuilding,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase.js";
@@ -124,26 +125,32 @@ const FleetDashboard = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] bg-brand-brown relative">
-      {/* ---- Header ----*/}
       <div className="bg-brand-dark text-white rounded-b-[2.5rem] shadow-xl flex-none z-20 overflow-hidden">
         <div className="flex justify-between items-center p-6 pb-2">
           <div className="flex items-center gap-3">
-            <FaUserCircle className="text-4xl text-gray-300" />
+            {user?.operatorType === "sltb" ? (
+              <FaBuilding className="text-4xl text-blue-300" />
+            ) : (
+              <FaUserCircle className="text-4xl text-gray-300" />
+            )}
+
             <div className="leading-tight">
               <p className="text-gray-400 text-[10px] uppercase font-bold tracking-wider">
-                Fleet Manager
+                {user?.operatorType === "sltb"
+                  ? "SLTB Depot"
+                  : "Private Operator"}
               </p>
-              <h1 className="text-lg font-bold truncate max-w-[150px]">
-                {user?.companyName || "Manager"}
+
+              <h1 className="text-lg font-bold truncate max-w-[200px]">
+                {user?.organizationName || "Manager"}
               </h1>
             </div>
           </div>
-
           <button
             onClick={handleLogout}
-            className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-red-500/20 active:scale-95 transition-all"
+            className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-red-500/20 "
           >
-            <FaSignOutAlt className="text-sm text-gray-300 hover:text-red-400" />
+            <FaSignOutAlt />
           </button>
         </div>
 
@@ -162,7 +169,6 @@ const FleetDashboard = () => {
               Drivers
             </button>
           </div>
-
           {user?.status === "approved" && (
             <button
               onClick={() =>
@@ -170,16 +176,15 @@ const FleetDashboard = () => {
                   ? setIsAddBusOpen(true)
                   : setIsAddDriverOpen(true)
               }
-              className="mb-3 flex items-center gap-2 bg-[#3a4149] active:bg-gray-600 text-white px-4 py-2 rounded-full font-bold text-xs shadow-lg border border-gray-600 active:scale-95 transition-all"
+              className="mb-3 flex items-center gap-2 bg-[#3a4149] text-white px-4 py-2 rounded-full font-bold text-xs shadow-lg active:scale-95 transition-all"
             >
-              {activeTab === "buses" ? <FaPlus /> : <FaUserTie />}
+              <FaPlus />{" "}
               <span>{activeTab === "buses" ? "Add Bus" : "Add Driver"}</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* ---- Main Content ---- */}
       <div className="flex-1 overflow-y-auto px-6 pt-6 pb-10 custom-scrollbar z-0">
         {user?.status === "pending" && (
           <div className="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-r shadow-md mb-6 animate-fadeIn">
@@ -188,8 +193,8 @@ const FleetDashboard = () => {
               <p className="font-bold">Account Under Review</p>
             </div>
             <p className="text-sm opacity-90">
-              You can browse the app, but you cannot add buses or drivers until
-              an admin approves your request.
+              An admin must approve your profile before you can manage your
+              fleet.
             </p>
           </div>
         )}
@@ -205,27 +210,23 @@ const FleetDashboard = () => {
               >
                 <div className="flex flex-col ml-2">
                   <h3 className="text-xl font-bold text-gray-800 mb-1">
-                    {bus.licensePlate}
+                    {bus.plateNumber}
                   </h3>
-                  {bus.currentDriver && (
-                    <div className="flex items-center gap-1 text-xs text-gray-600 font-bold mb-1">
-                      <FaUserTie className="text-brand-brown" />
-                      <span>{bus.currentDriver}</span>
-                    </div>
-                  )}
+
+                  <p className="text-xs text-gray-500 font-bold mb-1 flex items-center gap-1">
+                    <FaBus className="text-gray-400" /> {bus.route}
+                  </p>
+
                   <span
-                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold w-fit ${
-                      bus.status === "online"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-gray-200 text-gray-500"
-                    }`}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold w-fit uppercase tracking-wide
+                            ${bus.isActive ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-500"}`}
                   >
-                    <FaCircle className="text-[8px]" />
-                    {bus.status === "online" ? "Online" : "Offline"}
+                    <FaCircle className="text-[6px]" />
+                    {bus.isActive ? "Online" : "Offline"}
                   </span>
                 </div>
-                <div className="bg-gray-200 h-12 w-12 rounded-full flex items-center justify-center shadow-sm">
-                  <FaChevronRight className="text-gray-600 text-xl" />
+                <div className="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center text-gray-600">
+                  <FaChevronRight className="text-sm" />
                 </div>
               </div>
             ))
@@ -237,13 +238,12 @@ const FleetDashboard = () => {
               <h2 className="text-2xl font-bold">No Buses Yet</h2>
               <p className="text-sm text-center max-w-xs mt-2 opacity-80">
                 {user?.status === "approved"
-                  ? 'Tap the "+ Add Bus" button above to register your first vehicle.'
+                  ? 'Tap "+ Add Bus" to upload documents and register your first vehicle.'
                   : "Once approved, you will be able to register your vehicles here."}
               </p>
             </div>
           ))}
 
-        {/* --- Driver List View --- */}
         {activeTab === "drivers" &&
           (drivers.length > 0 ? (
             drivers.map((driver) => (
@@ -260,8 +260,6 @@ const FleetDashboard = () => {
                     <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded-md">
                       {driver.username}
                     </span>
-                    <span>|</span>
-                    <span>{driver.licenseNumber}</span>
                   </div>
                 </div>
                 <div className="bg-gray-200 h-10 w-10 rounded-full flex items-center justify-center text-gray-600">
@@ -277,7 +275,7 @@ const FleetDashboard = () => {
               <h2 className="text-2xl font-bold">No Drivers Yet</h2>
               <p className="text-sm text-center max-w-xs mt-2 opacity-80">
                 {user?.status === "approved"
-                  ? "Tap + Add Drivers to add drivers to your fleet and start your first trip."
+                  ? "Tap + Add Drivers to add drivers to your fleet."
                   : "Approval required to add drivers."}
               </p>
             </div>

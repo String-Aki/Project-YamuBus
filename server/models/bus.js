@@ -3,17 +3,17 @@ const { Schema } = mongoose;
 
 const busSchema = new Schema(
   {
-    licensePlate: {
+    fleetManager: {
+      type: Schema.Types.ObjectId,
+      ref: "FleetManager",
+      required: true,
+    },
+    plateNumber: {
       type: String,
       required: true,
       unique: true,
       trim: true,
       uppercase: true,
-    },
-    fleetManager: {
-      type: Schema.Types.ObjectId,
-      ref: "FleetManager",
-      required: true,
     },
     currentDriver: {
       type: String,
@@ -24,11 +24,21 @@ const busSchema = new Schema(
       required: true,
       trim: true,
     },
-    status: {
+    registrationCertificate: {
       type: String,
-      enum: ["online", "offline"],
-      default: "offline",
+      required: true,
     },
+    routePermit: {
+      type: String,
+      required: true,
+    },
+    verificationStatus: {
+      type: String,
+      enum: ["pending", "verified", "rejected"],
+      default: "pending",
+    },
+
+    isActive: { type: Boolean, default: false },
   },
   {
     timestamps: true,
