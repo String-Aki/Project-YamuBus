@@ -67,13 +67,13 @@ const SetupBus = () => {
   const handleSave = () => {
     if (!selectedBus) return;
     localStorage.setItem("MOUNTED_BUS_ID", selectedBus._id);
-    localStorage.setItem("MOUNTED_BUS_PLATE", selectedBus.licensePlate);
+    localStorage.setItem("MOUNTED_BUS_PLATE", selectedBus.plateNumber);
     if (selectedBus.route) {
       localStorage.setItem("MOUNTED_ROUTE_INFO", selectedBus.route);
     } else {
       localStorage.setItem("MOUNTED_ROUTE_INFO", "No Route");
     }
-    alert(`Device successfully bound to ${selectedBus.licensePlate}`);
+    alert(`Device successfully bound to ${selectedBus.plateNumber}`);
     navigate("/login");
   };
 
@@ -175,7 +175,7 @@ const SetupBus = () => {
                   <div className="flex items-center gap-3">
                     <FaBus />
                     <span className="font-mono text-sm font-bold tracking-wide">
-                      {bus.licensePlate}
+                      {bus.plateNumber}
                     </span>
                   </div>
                     {selectedBus?._id === bus._id && <FaCheckCircle />}

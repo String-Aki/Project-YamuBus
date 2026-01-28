@@ -101,7 +101,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Personal Info */}
               <div className="flex gap-3">
                 <div className="flex-1 bg-gray-50 rounded-xl p-3 flex items-center border border-transparent focus-within:border-brand-brown">
                   <FaUser className="text-gray-400 mr-2" />
@@ -141,7 +140,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
 
               <hr className="border-gray-100 my-2" />
 
-              {/* Login Credentials */}
               <p className="text-xs font-bold text-gray-400 uppercase">
                 App Credentials
               </p>
@@ -195,7 +193,10 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
               security reasons, it cannot be recovered later.
             </p>
 
-            <div id="printable-card" className="bg-white border-2 border-dashed border-gray-300 p-6 rounded-xl mb-6 w-full flex flex-col items-center shadow-sm">
+            <div
+              id="printable-card"
+              className="bg-white border-2 border-dashed border-gray-300 p-6 rounded-xl mb-6 w-full flex flex-col items-center shadow-sm"
+            >
               <h3 className="font-bold text-xl uppercase tracking-widest text-brand-dark mb-1">
                 Driver ID
               </h3>
