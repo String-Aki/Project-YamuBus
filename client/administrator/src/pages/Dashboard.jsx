@@ -59,7 +59,7 @@ const Dashboard = () => {
     fetchDashboardData();
   }, [activeTab]);
 
-  const handleAction = async (status) => {
+  const handleAction = async (status, routeId = null) => {
     if (!selectedItem || !modalType) return;
 
     const isManager = modalType === "manager";
@@ -71,7 +71,7 @@ const Dashboard = () => {
       const token = localStorage.getItem("adminToken");
       await axios.patch(
         endpoint,
-        { status },
+        { status, routeId },
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
@@ -143,7 +143,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 p-8 font-sans text-slate-800">
-
       <div className="flex justify-between items-center mb-10">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">

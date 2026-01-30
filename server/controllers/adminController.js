@@ -98,16 +98,20 @@ const deleteManager = asyncHandler(async (req, res) => {
   res.json({ message: "Manager and their fleet deleted successfully" });
 });
 
-// @desc Verify or Reject a Bus
+// @desc Verify or Reject a Bus & Assign Route
 // @route PATCH /api/admin/buses/:id/verify
 // @access Private
 const updateBusVerification = asyncHandler(async (req, res) => {
-  const { status } = req.body;
+  const { status, routeId } = req.body;
 
   const bus = await Bus.findById(req.params.id);
   if (!bus) {
     res.status(404);
     throw new Error("Bus not found");
+  }
+
+  if (status === 'verified' && routeId) {
+      bus.routeId = routeId;
   }
 
   bus.verificationStatus = status;

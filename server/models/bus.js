@@ -24,6 +24,11 @@ const busSchema = new Schema(
       required: true,
       trim: true,
     },
+    routeId: {
+      type: Schema.Types.ObjectId,
+      ref: "Route",
+      default: null,
+    },
     registrationCertificate: {
       type: String,
       required: true,

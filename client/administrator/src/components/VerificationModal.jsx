@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   FaTimes,
   FaIdCard,
@@ -6,7 +7,11 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
   FaExternalLinkAlt,
+  FaChevronDown,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const VerificationModal = ({
   isOpen,
@@ -16,6 +21,39 @@ const VerificationModal = ({
   onAction,
   onInspectOwner,
 }) => {
+  const [routes, setRoutes] = useState([]);
+  const [selectedRouteId, setSelectedRouteId] = useState("");
+  const [loadingRoutes, setLoadingRoutes] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && type === "bus") {
+      fetchRoutes();
+      setSelectedRouteId("");
+    }
+  }, [isOpen, type]);
+
+  const fetchRoutes = async () => {
+    try {
+      setLoadingRoutes(true);
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.get(`${API_URL}/routes`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRoutes(res.data);
+    } catch (error) {
+      console.error("Failed to fetch routes", error);
+    } finally {
+      setLoadingRoutes(false);
+    }
+  };
+
+  const handleVerifyBus = () => {
+    if (type === "bus" && !selectedRouteId) {
+      return toast.error("Please assign a Route Path before verifying.");
+    }
+    onAction("verified", selectedRouteId);
+  };
+
   if (!isOpen || !data) return null;
 
   const isManager = type === "manager";
@@ -80,7 +118,7 @@ const VerificationModal = ({
               value={isManager ? data.organizationName : data.plateNumber}
             />
             <DetailBox
-              label={isManager ? "NIC Number" : "Route Number"}
+              label={isManager ? "NIC Number" : "Route Number (Text)"}
               value={isManager ? data.nicNumber : data.route}
             />
             {isManager && (
@@ -90,6 +128,35 @@ const VerificationModal = ({
               <DetailBox label="Operator Type" value={data.operatorType} />
             )}
           </div>
+
+          {isBus && (
+            <div className="mb-6">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 block ml-1">
+                Assign Route Path
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedRouteId}
+                  onChange={(e) => setSelectedRouteId(e.target.value)}
+                  disabled={loadingRoutes}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 font-bold text-sm rounded-xl p-3 focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                >
+                  <option value="">-- Select a Route --</option>
+                  {routes.map((route) => (
+                    <option key={route._id} value={route._id}>
+                      {route.routeNumber} - {route.routeName}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                  <FaChevronDown />
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1 ml-1">
+                Select the mapped route that matches the permit.
+              </p>
+            </div>
+          )}
 
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 ml-1">
             Submitted Documents
@@ -136,10 +203,10 @@ const VerificationModal = ({
 
           <div className="flex gap-3 pt-4 border-t border-slate-100">
             <button
-              onClick={() => onAction(isManager ? "approved" : "verified")}
+              onClick={() => (isBus ? handleVerifyBus() : onAction("approved"))}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-green-200 text-sm"
             >
-              {isManager ? "Approve Entity" : "Verify Vehicle"}
+              {isManager ? "Approve Entity" : "Verify & Assign"}
             </button>
             <button
               onClick={() => onAction("rejected")}
