@@ -15,7 +15,7 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onDelete }) => {
     setLoading(true);
     try {
       const token = await auth.currentUser.getIdToken();
-      await axios.delete(`${API_URL}/buses/${bus._id}`, {
+      await axios.delete(`${API_URL}/fleetmanagers/buses/${bus._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onDelete(bus._id);

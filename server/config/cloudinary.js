@@ -55,7 +55,7 @@ const uploadToCloudinaryBase64 = async (buffer, options = {}) => {
   const uploadOptions = {
     folder: "yamubus_uploads",
     resource_type: "auto",
-    timeout: 120000,
+    timeout: 180000, // 3 minutes timeout
     ...options,
   };
 
@@ -69,27 +69,24 @@ const processCloudinaryUploads = (fieldNames) => {
         return next();
       }
 
-      const uploadPromises = [];
-
+      // Upload files sequentially to avoid timeout issues
       for (const fieldName of fieldNames) {
         const files = req.files[fieldName];
         if (files && files.length > 0) {
           for (const file of files) {
             console.log(`Uploading ${fieldName}: ${file.originalname} (${(file.size / 1024).toFixed(2)} KB)`);// Remove on prod
             
-            const uploadPromise = uploadToCloudinaryBase64(file.buffer, {
+            const result = await uploadToCloudinaryBase64(file.buffer, {
               folder: "yamubus_uploads",
-            }).then((result) => {
-              console.log(`Uploaded ${fieldName} successfully: ${result.secure_url}`);// Remove on Prod
-              file.path = result.secure_url;
-              file.cloudinaryId = result.public_id;
             });
-            uploadPromises.push(uploadPromise);
+            
+            console.log(`Uploaded ${fieldName} successfully: ${result.secure_url}`);// Remove on Prod
+            file.path = result.secure_url;
+            file.cloudinaryId = result.public_id;
           }
         }
       }
 
-      await Promise.all(uploadPromises);
       next();
     } catch (error) {
       console.error("Cloudinary upload error:", error);

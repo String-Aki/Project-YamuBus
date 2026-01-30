@@ -1,8 +1,7 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
 import { FaBus, FaMapSigns, FaTimes, FaCloudUploadAlt, FaCheckCircle } from "react-icons/fa";
-import { auth, storage } from "../../config/firebase.js";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth } from "../../config/firebase.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,14 +39,6 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
     }
   };
 
-  const createSafeFileName = (prefix, plate, file) => {
-    const fileExt = file.name.split('.').pop();
-    const safePlate = plate.replace(/[^a-zA-Z0-9]+/g, "_").toUpperCase(); 
-    
-    const timestamp = Date.now();
-    return `bus_docs_${prefix}_${safePlate}_${timestamp}.${fileExt}`;
-  };
-
   const handleSubmit = async () => {
     if (!formData.plateNumber || !formData.route || !regFile || !permitFile)
       return alert("Please fill all fields and upload both documents.");
@@ -58,31 +49,21 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
     try {
       const token = await auth.currentUser.getIdToken();
 
-      const regPath = createSafeFileName("reg", formData.plateNumber, regFile);
-      const permitPath = createSafeFileName("permit", formData.plateNumber, permitFile);
+      const data = new FormData();
+      data.append("plateNumber", formData.plateNumber.toUpperCase());
+      data.append("route", formData.route);
 
-      const regRef = ref(storage, regPath);
-      const permitRef = ref(storage, permitPath);
-
-      const [regSnap, permitSnap] = await Promise.all([
-        uploadBytes(regRef, regFile),
-        uploadBytes(permitRef, permitFile)
-      ]);
+      data.append("registrationCertificate", regFile);
+      data.append("routePermit", permitFile);
 
       setUploadProgress("Verifying...");
 
-      const regUrl = await getDownloadURL(regSnap.ref);
-      const permitUrl = await getDownloadURL(permitSnap.ref);
-
       const res = await axios.post(
         `${API_URL}/fleetmanagers/buses`, 
-        {
-          plateNumber: formData.plateNumber.toUpperCase(),
-          route: formData.route,
-          registrationCertificate: regUrl,
-          routePermit: permitUrl
+        data,
+        { 
+          headers: { Authorization: `Bearer ${token}` } 
         },
-        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       onBusAdded(res.data);

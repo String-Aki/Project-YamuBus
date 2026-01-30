@@ -146,11 +146,11 @@ const loginDriver = asyncHandler(async (req, res) => {
     const activeTrip = await Trip.findOne({ 
         driver: driver._id, 
         status: 'active' 
-    }).populate('bus', 'licensePlate');
+    }).populate('bus', 'plateNumber');
 
     if (activeTrip && activeTrip.bus._id.toString() !== busId) {
          res.status(400);
-         throw new Error(`You have an active trip on another bus (${activeTrip.bus.licensePlate}). End that first.`);
+         throw new Error(`You have an active trip on another bus (${activeTrip.bus.plateNumber}). End that first.`);
     }
 
     if (activeTrip) {
