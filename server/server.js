@@ -27,7 +27,7 @@ const io = new Server(httpServer, {
   },
 });
 
-app.set('io', io);
+app.set("io", io);
 
 app.use(cors());
 app.use(express.json());
@@ -39,7 +39,7 @@ app.get("/", (req, res) => {
 app.use("/api/fleetmanagers", fleetManagerRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/trips", tripRoutes);
-app.use('/api/admin', adminRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/routes", router);
 app.use("/api/buses", publicBusRoutes);
 
@@ -52,7 +52,13 @@ io.on("connection", (socket) => {
   }
 
   socket.on("driverLocation", (data) => {
-    console.log("📢 SERVER HEARD DRIVER:", data.busPlate, "at", data.lat, data.lng);
+    console.log(
+      "📢 SERVER HEARD DRIVER:",
+      data.busPlate,
+      "at",
+      data.lat,
+      data.lng,
+    );
     const busData = {
       ...data,
       lastUpdated: Date.now(),
@@ -66,11 +72,11 @@ io.on("connection", (socket) => {
     console.log(`Bus ${data.busPlate} moved to ${data.lat}, ${data.lng}`);
   });
 
-  socket.on('tripEnded', (busId) => {
+  socket.on("tripEnded", (busId) => {
     console.log(`🧹 Cleaning up: Removing Bus ${busId} from active fleet.`);
-    
+
     delete activeFleet[busId];
-    io.emit('busOffline', { busId });
+    io.emit("busOffline", { busId });
   });
 
   socket.on("disconnect", () => {

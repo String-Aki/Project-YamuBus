@@ -11,7 +11,10 @@ const createBus = asyncHandler(async (req, res) => {
     res.status(403);
     throw new Error("Account pending approval. You cannot add buses yet.");
   }
-  const { plateNumber, route, registrationCertificate, routePermit } = req.body;
+  const { plateNumber, route } = req.body;
+
+  const registrationCertificate = req.files?.['registrationCertificate']?.[0]?.path;
+  const routePermit = req.files?.['routePermit']?.[0]?.path;
 
   if (!plateNumber || !route || !registrationCertificate || !routePermit) {
     res.status(400);

@@ -206,7 +206,7 @@ const VerificationModal = ({
               onClick={() => (isBus ? handleVerifyBus() : onAction("approved"))}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-green-200 text-sm"
             >
-              {isManager ? "Approve Entity" : "Verify & Assign"}
+              {isManager ? "Approve Applicant" : "Verify & Assign"}
             </button>
             <button
               onClick={() => onAction("rejected")}

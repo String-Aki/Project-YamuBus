@@ -2,13 +2,18 @@ import asyncHandler from "express-async-handler";
 import FleetManager from "../models/fleetmanager.js";
 
 const registerFleetManager = asyncHandler(async (req, res) => {
-  const { fullName,organizationName, operatorType, contactEmail, contactPhone, nicNumber, nicFrontImage, nicBackImage,verificationDocument, firebaseUID } = req.body;
+
+  const { fullName,organizationName, operatorType, contactEmail, contactPhone, nicNumber,firebaseUID } = req.body;
+
+  const nicFrontImage = req.files?.["nicFrontImage"]?.[0]?.path;
+  const nicBackImage = req.files?.["nicBackImage"]?.[0]?.path;
+  const verificationDocument = req.files?.["verificationDocument"]?.[0]?.path;
 
   if (!fullName || !organizationName || !contactEmail || !contactPhone || !firebaseUID || !nicNumber || !nicFrontImage || !nicBackImage || !verificationDocument) {
     res.status(400);
     throw new Error("Please Provide All Required Fields");
   }
-
+    
   const emailExists = await FleetManager.findOne({ contactEmail });
   const uidExists = await FleetManager.findOne({ firebaseUID });
   const nicExists = await FleetManager.findOne({ nicNumber });
@@ -50,6 +55,13 @@ const registerFleetManager = asyncHandler(async (req, res) => {
 // @route Get /api/fleetmanagers/me
 // @acces Private
 const getMe = asyncHandler(async(req, res) =>{
+  const user = {
+    _id: req.user._id,
+    fullName: req.user.fullName,
+    email: req.user.contactEmail,
+    organizationName: req.user.organizationName,
+    status: req.user.status,
+  };
   res.status(200).json(req.user);
 });
 
