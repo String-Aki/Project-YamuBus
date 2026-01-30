@@ -101,4 +101,20 @@ const getBusesForSetup = asyncHandler(async (req, res) => {
   }
 });
 
-export { createBus, getMyBuses, deleteBus, getBusesForSetup };
+// @desc Get Bus Details with Route Path (Public)
+// @route GET /api/buses/:id
+// @access Public
+const getBusById = asyncHandler(async (req, res) => {
+  const bus = await Bus.findById(req.params.id)
+    .populate('routeId')
+    .select('-registrationCertificate -routePermit -fleetManager');
+
+  if (bus) {
+    res.json(bus);
+  } else {
+    res.status(404);
+    throw new Error("Bus not found");
+  }
+});
+
+export { createBus, getMyBuses, deleteBus, getBusesForSetup, getBusById };

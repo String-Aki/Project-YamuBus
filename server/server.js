@@ -11,6 +11,7 @@ import driverRoutes from "./routes/driverRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import router from "./routes/routeRoutes.js";
+import publicBusRoutes from "./routes/publicBusRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -40,6 +41,7 @@ app.use("/api/drivers", driverRoutes);
 app.use("/api/trips", tripRoutes);
 app.use('/api/admin', adminRoutes);
 app.use("/api/routes", router);
+app.use("/api/buses", publicBusRoutes);
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);

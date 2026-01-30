@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  Polyline,
+} from "react-leaflet";
 import L from "leaflet";
 import io from "socket.io-client";
+import axios from "axios";
 import { ArrowLeft, Navigation, MapPin } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 const busIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
   iconSize: [45, 45],
   iconAnchor: [22, 45],
   popupAnchor: [0, -45],
+});
+
+const stopIcon = new L.DivIcon({
+  className: "bg-transparent",
+  html: `<div style="background-color: #ef4444; width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+  iconSize: [12, 12],
+  iconAnchor: [6, 6],
 });
 
 const RecenterMap = ({ lat, lng }) => {
@@ -47,6 +64,25 @@ const Tracker = () => {
 
   const [busData, setBusData] = useState(location.state?.busData || null);
   const [isConnected, setIsConnected] = useState(false);
+  const [routeData, setRouteData] = useState(null);
+
+  useEffect(() => {
+    const fetchRoute = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/buses/${busId}`);
+
+        if (res.data && res.data.routeId) {
+          setRouteData(res.data.routeId);
+        }
+      } catch (error) {
+        console.error("Failed to load route path:", error);
+      }
+    };
+
+    if (busId) {
+      fetchRoute();
+    }
+  }, [busId]);
 
   useEffect(() => {
     const socket = io(import.meta.env.VITE_SOCKET_URL, {
@@ -117,6 +153,29 @@ const Tracker = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+
+        {routeData && routeData.path && (
+          <Polyline
+            positions={routeData.path}
+            color="#3b82f6"
+            weight={6}
+            opacity={0.8}
+          />
+        )}
+
+        {routeData &&
+          routeData.stops &&
+          routeData.stops.map((stop, index) => (
+            <Marker
+              key={index}
+              position={[stop.location.lat, stop.location.lng]}
+              icon={stopIcon}
+            >
+              <Popup offset={[0, -5]}>
+                <span className="font-bold text-xs">{stop.name}</span>
+              </Popup>
+            </Marker>
+          ))}
 
         <Marker position={[busData.lat, busData.lng]} icon={busIcon}>
           <Popup className="font-semibold text-center">
