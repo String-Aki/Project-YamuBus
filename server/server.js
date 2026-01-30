@@ -10,6 +10,7 @@ import fleetManagerRoutes from "./routes/fleetManagerRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import tripRoutes from "./routes/tripRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import router from "./routes/routeRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -38,6 +39,7 @@ app.use("/api/fleetmanagers", fleetManagerRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/trips", tripRoutes);
 app.use('/api/admin', adminRoutes);
+app.use("/api/routes", router);
 
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);

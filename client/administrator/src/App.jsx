@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import RouteMaster from './pages/RouteMaster';
 import Layout from './components/Layout';
 
 const PrivateRoute = () => {
@@ -21,6 +22,7 @@ function App() {
         <Route element={<PrivateRoute />}>
             <Route element={<Layout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/routes" element={<RouteMaster />} />
             </Route>
         </Route>
       </Routes>
