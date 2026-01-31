@@ -3,7 +3,7 @@ import axios from "axios";
 import { FaBus, FaMapSigns, FaTimes, FaCloudUploadAlt, FaCheckCircle } from "react-icons/fa";
 import { auth } from "../../config/firebase.js";
 import toast from "react-hot-toast";
-import { handleError, handleSuccess } from '../utils/toastUtils';
+import { handleError, handleSuccess } from '../../utils/toastUtils.js';
 
 const API_URL = import.meta.env.VITE_API_URL;
 

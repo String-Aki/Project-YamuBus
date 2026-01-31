@@ -11,7 +11,7 @@ import {
 import L from "leaflet";
 import io from "socket.io-client";
 import axios from "axios";
-import { ArrowLeft, Navigation, MapPin } from "lucide-react";
+import { ArrowLeft, Navigation, MapPin, Crosshair } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import { handleError, handleSuccess } from "../utils/toastUtils";
 import toast from "react-hot-toast";
@@ -33,13 +33,25 @@ const stopIcon = new L.DivIcon({
   iconAnchor: [6, 6],
 });
 
-const RecenterMap = ({ lat, lng }) => {
+const userIcon = new L.DivIcon({
+  className: "bg-transparent",
+  html: `
+    <div class="relative flex items-center justify-center w-6 h-6">
+      <span class="absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75 animate-ping"></span>
+      <span class="relative inline-flex rounded-full h-4 w-4 bg-blue-600 border-2 border-white shadow-md"></span>
+    </div>
+  `,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12],
+});
+
+const RecenterMap = ({ center, trigger }) => {
   const map = useMap();
   useEffect(() => {
-    if (lat && lng) {
-      map.flyTo([lat, lng], map.getZoom(), { animate: true, duration: 1.5 });
+    if (center && center[0] && center[1]) {
+      map.flyTo(center, 15, { animate: true, duration: 1.5 });
     }
-  }, [lat, lng, map]);
+  }, [trigger]);
   return null;
 };
 
@@ -66,14 +78,20 @@ const Tracker = () => {
   const navigate = useNavigate();
 
   const [busData, setBusData] = useState(location.state?.busData || null);
-  const [isConnected, setIsConnected] = useState(false);
   const [routeData, setRouteData] = useState(null);
+
+  const [userLocation, setUserLocation] = useState(null);
+  const [mapCenter, setMapCenter] = useState(null);
+  const [recenterTrigger, setRecenterTrigger] = useState(0);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
   useEffect(() => {
     const fetchRoute = async () => {
       try {
         const res = await axios.get(`${API_URL}/buses/${busId}`);
-
         if (res.data && res.data.routeId) {
           setRouteData(res.data.routeId);
         }
@@ -97,6 +115,10 @@ const Tracker = () => {
     socket.on("busUpdate", (data) => {
       if (data.busId === busId) {
         setBusData(data);
+        if (!mapCenter) {
+          setMapCenter([data.lat, data.lng]);
+          setRecenterTrigger((prev) => prev + 1);
+        }
       }
     });
 
@@ -107,16 +129,49 @@ const Tracker = () => {
       }
     });
 
+    let watchId;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation([latitude, longitude]);
+        },
+        (error) => console.warn("Location Access Denied:", error),
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 },
+      );
+    }
+
     return () => socket.disconnect();
   }, [busId, navigate]);
 
-  if (!busData)
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-        <p className="text-gray-500 font-medium">Locating Bus...</p>
-      </div>
-    );
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientY);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientY);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isUpSwipe = distance > minSwipeDistance;
+    const isDownSwipe = distance < -minSwipeDistance;
+
+    if (isUpSwipe) setIsExpanded(true);
+    if (isDownSwipe) setIsExpanded(false);
+  };
+
+  const handleRecenterUser = () => {
+    if (userLocation) {
+      setMapCenter(userLocation);
+      setRecenterTrigger((prev) => prev + 1);
+      handleSuccess("Located You!");
+    } else {
+      toast.error("Waiting for your location...");
+    }
+  };
 
   const handleShare = async () => {
     const shareData = {
@@ -137,6 +192,14 @@ const Tracker = () => {
       toast.error("Could not share link");
     }
   };
+
+  if (!busData)
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-gray-500 font-medium">Locating Bus...</p>
+      </div>
+    );
 
   return (
     <div className="relative w-full h-screen bg-gray-100 overflow-hidden">
@@ -187,27 +250,49 @@ const Tracker = () => {
           </Popup>
         </Marker>
 
-        <RecenterMap lat={busData.lat} lng={busData.lng} />
+        {userLocation && (
+          <Marker position={userLocation} icon={userIcon}>
+            <Popup>You are here</Popup>
+          </Marker>
+        )}
+
+        <RecenterMap center={mapCenter} trigger={recenterTrigger} />
       </MapContainer>
 
-      <div className="absolute bottom-0 left-0 right-0 z-[1000] bg-white rounded-t-[30px] shadow-[0_-5px_30px_rgba(0,0,0,0.1)] pb-6">
-        <div className="w-full flex justify-center pt-3 pb-1">
+      <button
+        onClick={handleRecenterUser}
+        className="absolute bottom-80 right-4 z-[2000] bg-white p-3 rounded-full shadow-lg border border-gray-100 text-blue-600 hover:bg-blue-50 active:scale-90 transition-all"
+      >
+        <Crosshair size={24} />
+      </button>
+
+      <div
+        className={`absolute bottom-0 left-0 right-0 z-[1000] bg-white rounded-t-[30px] shadow-[0_-5px_30px_rgba(0,0,0,0.1)] transition-all duration-300 ease-in-out ${
+          isExpanded ? "pb-6" : "pb-4"
+        }`}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        <div
+          className="w-full flex justify-center pt-3 pb-1 cursor-pointer"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
           <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
-        <div className="p-6">
-          <div className="flex justify-between items-end mb-6">
+        <div className="px-6 pt-2">
+          <div className="flex justify-between items-end">
             <div>
               <div className="flex items-center gap-2 mb-2">
-
-                <span className={`text-xs font-bold px-2 py-1 rounded-lg shadow-sm ${
-                    busData.operatorType === 'sltb' 
-                    ? "bg-red-600 text-white" 
-                    : "bg-blue-600 text-white"
-                }`}>
-                   {busData.operatorType === 'sltb' ? "SLTB" : "PVT"}
+                <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-lg">
+                  ROUTE {busData.routeNo}
                 </span>
-
+                <span
+                  className={`text-xs font-bold px-2 py-1 rounded-lg text-white ${busData.operatorType === "sltb" ? "bg-red-600" : "bg-blue-600"}`}
+                >
+                  {busData.operatorType === "sltb" ? "SLTB" : "PVT"}
+                </span>
                 <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-lg border border-yellow-500 shadow-sm">
                   {busData.busPlate}
                 </span>
@@ -219,7 +304,6 @@ const Tracker = () => {
                 From: {busData.origin}
               </p>
             </div>
-
             <div className="text-right pl-4">
               <div className="text-3xl font-black text-blue-600 leading-none">
                 {Math.round(busData.speed * 3.6)}
@@ -230,45 +314,52 @@ const Tracker = () => {
             </div>
           </div>
 
-          <hr className="border-gray-100 mb-6" />
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
-                <Navigation
-                  size={20}
-                  style={{ transform: `rotate(${busData.heading || 0}deg)` }}
-                />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 font-bold uppercase">
-                  Heading
-                </p>
-                <p className="text-sm font-semibold text-gray-700">
-                  {getCardinalDirection(busData.heading)}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 text-right">
-              <div>
-                <p className="text-xs text-gray-400 font-bold uppercase">
-                  Status
-                </p>
-                <p className="text-sm font-semibold text-gray-700">Active</p>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
-                <MapPin size={20} />
-              </div>
-            </div>
-          </div>
-
-          <button
-            className="w-full mt-6 bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
-            onClick={handleShare}
+          <div
+            className={`overflow-hidden transition-all duration-500 ease-in-out ${
+              isExpanded
+                ? "max-h-[500px] opacity-100 mt-6"
+                : "max-h-0 opacity-0 mt-0"
+            }`}
           >
-            Share Trip
-          </button>
+            <hr className="border-gray-100 mb-6" />
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+                  <Navigation
+                    size={20}
+                    style={{ transform: `rotate(${busData.heading || 0}deg)` }}
+                  />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase">
+                    Heading
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {getCardinalDirection(busData.heading)}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-right">
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase">
+                    Status
+                  </p>
+                  <p className="text-sm font-semibold text-gray-700">Active</p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600">
+                  <MapPin size={20} />
+                </div>
+              </div>
+            </div>
+
+            <button
+              className="w-full mt-6 bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:scale-[1.02] active:scale-95 transition-all"
+              onClick={handleShare}
+            >
+              Share Trip
+            </button>
+          </div>
         </div>
       </div>
     </div>

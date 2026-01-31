@@ -143,13 +143,6 @@ const Login = () => {
           </p>
         </div>
 
-        {error && (
-          <div className="mb-4 bg-red-500/10 border border-red-500/50 p-3 rounded-xl flex items-center gap-2 text-red-400 text-sm font-bold animate-pulse">
-            <FaExclamationCircle />
-            <span>{error}</span>
-          </div>
-        )}
-
         <div className="relative overflow-hidden rounded-2xl bg-black aspect-square border-2 border-dashed border-gray-600 flex flex-col items-center justify-center">
           {loading && !isCameraOpen && (
             <div className="text-center animate-pulse">
