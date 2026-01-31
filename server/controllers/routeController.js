@@ -1,8 +1,8 @@
 import asyncHandler from "express-async-handler";
 import Route from "../models/route.js";
 
-// @desc    Create a new Route
-// @route   POST /api/routes
+// @desc Create a new Route
+// @route POST /api/routes
 const createRoute = asyncHandler(async (req, res) => {
   const { routeNumber, routeName, stops, path, color } = req.body;
 
@@ -16,15 +16,15 @@ const createRoute = asyncHandler(async (req, res) => {
   res.status(201).json(route);
 });
 
-// @desc    Get All Routes
-// @route   GET /api/routes
+// @desc Get All Routes
+// @route GET /api/routes
 const getRoutes = asyncHandler(async (req, res) => {
   const routes = await Route.find({});
   res.json(routes);
 });
 
-// @desc    Delete Route
-// @route   DELETE /api/routes/:id
+// @desc Delete Route
+// @route DELETE /api/routes/:id
 const deleteRoute = asyncHandler(async (req, res) => {
   const route = await Route.findById(req.params.id);
   if (route) {

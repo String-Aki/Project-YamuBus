@@ -23,7 +23,6 @@ const driverSchema = mongoose.Schema(
       required: true,
       trim: true
     },
-    // --- LOGIN CREDENTIALS ---
     username: {
       type: String,
       required: true,

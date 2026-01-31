@@ -165,7 +165,6 @@ const CreateAccount = () => {
       if (userCredential && userCredential.user) {
           try {
               await deleteUser(userCredential.user);
-              console.log("Cleanup: Deleted orphaned Firebase user.");//Remove on prod
           } catch (cleanupError) {
               console.error("Cleanup Failed: Could not delete Firebase user.", cleanupError);
           }
