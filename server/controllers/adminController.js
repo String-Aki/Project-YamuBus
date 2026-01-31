@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import SuperAdmin from "../models/SuperAdmin.js";
 import FleetManager from "../models/fleetmanager.js";
 import Bus from "../models/bus.js";
+import Driver from "../models/driver.js";
 import generateToken from "../utils/generateToken.js";
 
 // @desc Auth Admin & Get Token
@@ -24,9 +25,9 @@ const loginAdmin = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get Admin Dashboard (Stats + Pending Items)
-// @route   GET /api/admin/dashboard
-// @access  Private (Admin)
+// @desc Get Admin Dashboard (Stats + Pending Items)
+// @route GET /api/admin/dashboard
+// @access Private
 const getAdminDashboard = asyncHandler(async (req, res) => {
   const stats = {
     totalManagers: await FleetManager.countDocuments({ status: "approved" }),
@@ -64,6 +65,20 @@ const getAllManagers = asyncHandler(async (req, res) => {
   res.json(managers);
 });
 
+// @desc Get Buses and Drivers for a specific Manager
+// @route GET /api/admin/managers/:id/assets
+// @access Private
+const getManagerAssets = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const [buses, drivers] = await Promise.all([
+    Bus.find({ fleetManager: id }).sort({ createdAt: -1 }),
+    Driver.find({ fleetManager: id }).sort({ createdAt: -1 }),
+  ]);
+
+  res.json({ buses, drivers });
+});
+
 // @desc Approve or Reject a Fleet Manager
 // @route PATCH /api/admin/managers/:id/status
 // @access Private
@@ -82,22 +97,6 @@ const updateManagerStatus = asyncHandler(async (req, res) => {
   res.json({ message: `Manager ${status}`, id: manager._id });
 });
 
-// @desc Permanently Delete a Manager and their buses
-// @route DELETE /api/admin/managers/:id
-// @access Private
-const deleteManager = asyncHandler(async (req, res) => {
-  const manager = await FleetManager.findById(req.params.id);
-
-  if (!manager) {
-    res.status(404);
-    throw new Error("Manager not found");
-  }
-  await Bus.deleteMany({ fleetManager: manager._id });
-
-  await manager.deleteOne();
-  res.json({ message: "Manager and their fleet deleted successfully" });
-});
-
 // @desc Verify or Reject a Bus & Assign Route
 // @route PATCH /api/admin/buses/:id/verify
 // @access Private
@@ -110,8 +109,8 @@ const updateBusVerification = asyncHandler(async (req, res) => {
     throw new Error("Bus not found");
   }
 
-  if (status === 'verified' && routeId) {
-      bus.routeId = routeId;
+  if (status === "verified" && routeId) {
+    bus.routeId = routeId;
   }
 
   bus.verificationStatus = status;
@@ -120,11 +119,79 @@ const updateBusVerification = asyncHandler(async (req, res) => {
   res.json({ message: `Bus ${status}`, id: bus._id });
 });
 
+// @desc Update Bus Route or Status (Ban/Unban)
+// @route PATCH /api/admin/buses/:id
+// @access Private
+const updateBus = asyncHandler(async (req, res) => {
+  const { route, verificationStatus } = req.body;
+  const bus = await Bus.findById(req.params.id);
+
+  if (!bus) {
+    res.status(404);
+    throw new Error("Bus not found");
+  }
+
+  if (route) bus.route = route;
+  if (verificationStatus) bus.verificationStatus = verificationStatus;
+
+  await bus.save();
+  res.json(bus);
+});
+
+// @desc Delete a Fleet Manager and ALL their assets (Cascading Delete)
+// @route DELETE /api/admin/managers/:id
+// @access Private
+const deleteManager = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  await Driver.deleteMany({ fleetManager: id });
+  await Bus.deleteMany({ fleetManager: id });
+
+  const manager = await FleetManager.findByIdAndDelete(id);
+
+  if (!manager) {
+    res.status(404);
+    throw new Error("Manager not found");
+  }
+
+  res.json({
+    message: "Manager and all associated assets deleted successfully",
+  });
+});
+
+// @desc Delete a specific Bus (Admin Override)
+// @route DELETE /api/admin/buses/:id
+// @access Private
+const deleteBusAdmin = asyncHandler(async (req, res) => {
+  const bus = await Bus.findByIdAndDelete(req.params.id);
+  if (!bus) {
+    res.status(404);
+    throw new Error("Bus not found");
+  }
+  res.json({ message: "Bus deleted" });
+});
+
+// @desc Delete a specific Driver (Admin Override)
+// @route DELETE /api/admin/drivers/:id
+// @access Private
+const deleteDriverAdmin = asyncHandler(async (req, res) => {
+  const driver = await Driver.findByIdAndDelete(req.params.id);
+  if (!driver) {
+    res.status(404);
+    throw new Error("Driver not found");
+  }
+  res.json({ message: "Driver deleted" });
+});
+
 export {
   loginAdmin,
   getAdminDashboard,
   getAllManagers,
+  getManagerAssets,
   updateManagerStatus,
-  deleteManager,
   updateBusVerification,
+  updateBus,
+  deleteManager,
+  deleteBusAdmin,
+  deleteDriverAdmin,
 };
