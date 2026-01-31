@@ -29,9 +29,8 @@ const PreventReSetup = ({ children }) => {
 const App = () => {
   
   return (
-    <>
-    <Toaster position="top-center" />
     <BrowserRouter>
+    <Toaster position="top-center" />
       <Routes>
         <Route path="/setup" element={
             <PreventReSetup>
@@ -61,7 +60,6 @@ const App = () => {
         <Route path="*" element={<Navigate to="/trip" replace />} />
       </Routes>
     </BrowserRouter>
-    </>
   );
 };
 

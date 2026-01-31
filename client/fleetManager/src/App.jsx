@@ -8,9 +8,8 @@ import PrivateRoute from './components/common/PrivateRoute.jsx';
 
 function App() {
   return (
-    <>
-    <Toaster position="top-center" />
     <Router>
+    <Toaster position="top-center" />
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/register" element={<CreateAccount />} />
@@ -26,7 +25,6 @@ function App() {
         />
       </Routes>
     </Router>
-    </>
   );
 }
 
