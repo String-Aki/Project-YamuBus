@@ -16,6 +16,7 @@ const Dashboard = () => {
     pendingManagers: 0,
     totalBuses: 0,
     pendingBuses: 0,
+    totalRoutes: 0,
   });
   const [pendingManagers, setPendingManagers] = useState([]);
   const [pendingBuses, setPendingBuses] = useState([]);
@@ -36,12 +37,27 @@ const Dashboard = () => {
       if (!token) return navigate("/admin/login");
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
-      const res = await axios.get(`${API_URL}/admin/dashboard`, config);
+      const [dashboardRes, routesRes] = await Promise.all([
+        axios.get(`${API_URL}/admin/dashboard`, config),
+        axios.get(`${API_URL}/routes`, config),
+      ]);
 
-      if (res.data?.stats) setStats(res.data.stats);
-      if (res.data?.pendingManagers)
-        setPendingManagers(res.data.pendingManagers);
-      if (res.data?.pendingBuses) setPendingBuses(res.data.pendingBuses);
+      const newStats = dashboardRes.data?.stats || {};
+
+      setStats({
+        ...newStats,
+        totalRoutes: routesRes.data.length || 0,
+      });
+
+      if (dashboardRes.data?.pendingManagers)
+        setPendingManagers(dashboardRes.data.pendingManagers);
+      if (dashboardRes.data?.pendingBuses)
+        setPendingBuses(dashboardRes.data.pendingBuses);
+
+      if (activeTab === "directory") {
+        const dirRes = await axios.get(`${API_URL}/admin/managers`, config);
+        setAllManagers(dirRes.data);
+      }
     } catch (error) {
       console.error("Fetch Error:", error);
       if (error.response?.status === 401) navigate("/admin/login");
