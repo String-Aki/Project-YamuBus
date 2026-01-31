@@ -2,6 +2,8 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 import { FaBus, FaMapSigns, FaTimes, FaCloudUploadAlt, FaCheckCircle } from "react-icons/fa";
 import { auth } from "../../config/firebase.js";
+import toast from "react-hot-toast";
+import { handleError, handleSuccess } from '../utils/toastUtils';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,7 +43,7 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
 
   const handleSubmit = async () => {
     if (!formData.plateNumber || !formData.route || !regFile || !permitFile)
-      return alert("Please fill all fields and upload both documents.");
+      return toast.error("Please fill all fields and upload both documents.");
 
     setLoading(true);
     setUploadProgress("Uploading Docs...");
@@ -72,11 +74,11 @@ const AddBusModal = ({ isOpen, onClose, onBusAdded }) => {
       setRegFile(null);
       setPermitFile(null);
       onClose();
-      alert("Bus Submitted for Verification!");
+      handleSuccess("Bus Submitted for Verification!");
 
     } catch (error) {
       console.error("Error adding bus:", error);
-      alert(error.response?.data?.message || "Failed to add bus");
+      handleError(error.response?.data?.message || "Failed to add bus");
     } finally {
       setLoading(false);
       setUploadProgress("");

@@ -12,6 +12,8 @@ import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
+import { handleError, handleSuccess } from '../utils/toastUtils';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -102,9 +104,9 @@ const CreateAccount = () => {
   const handleNext = async () => {
     if (currentStep === 1) {
       if (!formData.fullName || !formData.email || !formData.password)
-        return alert("Please fill all fields");
+        return toast.error("Please fill all fields");
       if (formData.password !== formData.confirmPassword)
-        return alert("Passwords do not match");
+        return toast.error("Passwords do not match");
       setCurrentStep(2);
     } else if (currentStep === 2) {
       if (
@@ -112,18 +114,18 @@ const CreateAccount = () => {
         !formData.contactPhone ||
         !formData.nicID
       )
-        return alert("Please complete all details");
+        return toast.error("Please complete all details");
       setCurrentStep(3);
     } else if (currentStep === 3) {
       if (!nicFront || !nicBack || !verificationDoc)
-        return alert("All verification documents are required.");
+        return toast.error("All verification documents are required.");
       handleSubmit();
     }
   };
 
   const handleSubmit = async () => {
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
@@ -154,7 +156,7 @@ const CreateAccount = () => {
         }
       });
 
-      alert("Account Application Submitted! Please wait for Admin Approval.");
+      handleSuccess("Account Application Submitted! Please wait for Admin Approval.");
       navigate('/login');
 
     } catch (error) {
@@ -168,7 +170,7 @@ const CreateAccount = () => {
               console.error("Cleanup Failed: Could not delete Firebase user.", cleanupError);
           }
       }
-      alert(error.response?.data?.message || "Registration Failed. Please try again.");
+      handleError(error, "Registration Failed. Please try again.");
       
     } finally {
       setIsLoading(false);

@@ -11,6 +11,7 @@ import {
   FaSave,
 } from "react-icons/fa";
 import { auth } from "../../config/firebase.js";
+import { handleError, handleSuccess } from "../../utils/toastUtils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -59,9 +60,10 @@ const DriverDetailsModal = ({
 
       onUpdate(res.data);
       setIsEditing(false);
+      handleSuccess("Driver details updated");
     } catch (error) {
       console.error("Failed to update driver", error);
-      alert("Failed to save changes.");
+      handleError(error, "Failed to save changes");
     } finally {
       setLoading(false);
     }
@@ -86,9 +88,10 @@ const DriverDetailsModal = ({
       );
       onDelete(driver._id);
       onClose();
+      handleSuccess("Driver deleted successfully");
     } catch (error) {
       console.error("Failed to delete", error);
-      alert("Failed to delete driver.");
+      handleError(error, "Failed to delete driver");
     } finally {
       setLoading(false);
     }

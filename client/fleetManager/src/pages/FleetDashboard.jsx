@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../config/firebase.js";
 import { signOut } from "firebase/auth";
 import axios from "axios";
+import { handleError } from "../utils/toastUtils";
 
 import AddBusModal from "../components/buses/AddBusModal.jsx";
 import BusDetailsModal from "../components/buses/BusDetailsModal.jsx";
@@ -75,6 +76,7 @@ const FleetDashboard = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
+        handleError(error, "Failed to load dashboard");
       } finally {
         setLoading(false);
       }

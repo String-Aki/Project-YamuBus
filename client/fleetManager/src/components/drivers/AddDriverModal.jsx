@@ -12,13 +12,13 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { auth } from "../../config/firebase.js";
+import { handleError, handleSuccess } from "../../utils/toastUtils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -49,9 +49,10 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
       );
 
       onDriverAdded(res.data);
+      handleSuccess("Driver Created Successfully");
       setStep(2);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to add driver");
+      handleError(err, "Failed to add driver");
     } finally {
       setLoading(false);
     }
@@ -93,12 +94,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
             <p className="text-sm text-gray-500 mb-6">
               Create credentials for a new driver.
             </p>
-
-            {error && (
-              <div className="bg-red-50 text-red-500 p-3 rounded-xl text-sm mb-4 font-bold">
-                {error}
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex gap-3">

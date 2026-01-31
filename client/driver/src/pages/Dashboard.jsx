@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { handleError } from "../utils/toastUtils";
 import axios from "axios";
 import {
   FaPowerOff,
@@ -47,8 +49,7 @@ const Dashboard = () => {
     const busId = localStorage.getItem("MOUNTED_BUS_ID");
 
     if (!busId) {
-      alert("Critical Error: Bus ID not found. Please re-bind device.");
-      return;
+      return toast.error("Critical Error: Bus ID not found. Please re-bind device.");
     }
 
     try {
@@ -61,8 +62,7 @@ const Dashboard = () => {
       navigate("/trip");
     } catch (error) {
       console.error(error);
-      const msg = error.response?.data?.message || "Failed to start trip";
-      alert(msg);
+      handleError(error, "Failed to start trip");
     }
   };
 

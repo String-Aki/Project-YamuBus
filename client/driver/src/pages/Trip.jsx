@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
+import toast from "react-hot-toast";
+import { handleError } from "../utils/toastUtils";
 import {
   FaStopCircle,
   FaClock,
@@ -80,7 +82,7 @@ const Trip = () => {
       };
 
       const geoError = (error) => {
-        console.error(`⚠️ GPS Error (${error.code}): ${error.message}`);
+        console.error(`GPS Error (${error.code}): ${error.message}`);
       };
 
       watchId.current = navigator.geolocation.watchPosition(
@@ -89,7 +91,7 @@ const Trip = () => {
         geoOptions,
       );
     } else {
-      alert("GPS not supported on this device!");
+      toast.error("GPS not supported on this device!");
     }
 
     const timer = setInterval(() => {
@@ -139,8 +141,7 @@ const Trip = () => {
       if (watchId.current) navigator.geolocation.clearWatch(watchId.current);
       navigate("/dashboard");
     } catch (error) {
-      alert("Error ending trip. Check connection.");
-      console.error(error);
+      handleError(error, "Error ending trip. Check connection.");
     }
   };
 

@@ -4,6 +4,8 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../config/firebase.js'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { handleError, handleSuccess } from '../utils/toastUtils';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -14,7 +16,7 @@ const Login = () => {
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleLogin = async () => {
-    if (!formData.email || !formData.password) return alert("Please fill in all fields");
+    if (!formData.email || !formData.password) return toast.error("Please fill in all fields");
 
     setIsLoading(true);
     try {
@@ -27,12 +29,12 @@ const Login = () => {
         headers: { Authorization: `Bearer ${token}` }
       };
       
-      console.log("Logged in!", firebaseUser.uid);
+      handleSuccess("Welcome back!");
       navigate('/dashboard'); 
 
     } catch (error) {
       console.error("Login Error:", error);
-      alert("Invalid Email or Password");
+      handleError(error);
     } finally {
       setIsLoading(false);
     }

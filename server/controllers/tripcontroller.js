@@ -55,11 +55,8 @@ const endTrip = asyncHandler(async (req, res) => {
 
     const io = req.app.get('io');
   if (io) {
-      console.log(`📢 TRIPS: Bus ${trip.bus} went offline.`); // Remove on deployment
-
       io.emit('busOffline', { busId: trip.bus.toString() });
   } else {
-      console.log("⚠️ Socket.io not found in request!");// Remove on deployment
   }
 
     res.status(200).json(trip);

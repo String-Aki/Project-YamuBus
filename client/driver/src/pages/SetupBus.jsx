@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase.js";
+import toast from "react-hot-toast";
+import { handleError, handleSuccess } from "../utils/toastUtils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,8 +29,7 @@ const SetupBus = () => {
 
   const handleLoadFleet = async () => {
     if (!email || !password) {
-      alert("Please enter email and password");
-      return;
+      return toast.error("Please enter email and password");
     }
 
     setLoading(true);
@@ -48,17 +49,15 @@ const SetupBus = () => {
       );
 
       if (data.length === 0) {
-        alert("No buses found for this manager.");
+        toast.error("No verified buses found for this manager.");
       } else {
         setBuses(data);
+        handleSuccess("Credentials Verified");
         setStep(2);
       }
     } catch (error) {
       console.error(error);
-      const errMsg = error.code
-        ? error.code.replace("auth/", "")
-        : "Authentication Failed";
-      alert(errMsg);
+      handleError(error, "Authentication Failed");
     } finally {
       setLoading(false);
     }
@@ -74,7 +73,7 @@ const SetupBus = () => {
     } else {
       localStorage.setItem("MOUNTED_ROUTE_INFO", "No Route");
     }
-    alert(`Device successfully bound to ${selectedBus.plateNumber}`);
+    handleSuccess(`Device bound to ${selectedBus.plateNumber}`);
     navigate("/login");
   };
 

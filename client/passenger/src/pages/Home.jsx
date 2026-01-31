@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import { getDistance } from "geolib";
-import { Bus, Search, Map, Navigation } from "lucide-react";
+import { Search } from "lucide-react";
+import toast from "react-hot-toast";
 import BusCard from "../components/BusCard";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const navigate = useNavigate();
@@ -16,23 +15,16 @@ const Home = () => {
   useEffect(() => {
     const SERVER_URL = import.meta.env.VITE_SOCKET_URL;
 
-    console.log(`🔌 Attempting to connect to: ${SERVER_URL}`);
-
     const socket = io(SERVER_URL, {
       transports: ["websocket", "polling"],
       reconnection: true,
     });
 
-    socket.on("connect", () => {
-      console.log(`✅ CONNECTED! Socket ID: ${socket.id}`);
-    });
-
     socket.on("connect_error", (err) => {
-      console.error(`❌ CONNECTION FAILED:`, err.message);
+      console.error(`CONNECTION FAILED:`, err.message);
     });
 
     socket.on("initialFleetState", (busArray) => {
-      console.log("📦 Received Initial Fleet:", busArray);
       const busMap = {};
       busArray.forEach((bus) => {
         busMap[bus.busId] = bus;
@@ -41,7 +33,6 @@ const Home = () => {
     });
 
     socket.on("busUpdate", (data) => {
-      console.log("📍 Bus Moved:", data.busPlate);
       setActiveBuses((prev) => ({
         ...prev,
         [data.busId]: data,
@@ -49,7 +40,6 @@ const Home = () => {
     });
 
     socket.on("busOffline", (data) => {
-      console.log("🚫 Bus went offline:", data.busId);
       setActiveBuses((prev) => {
         const newState = { ...prev };
         delete newState[data.busId];
@@ -62,16 +52,19 @@ const Home = () => {
         (position) => {
           setUserLocation({
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude, 
+            longitude: position.coords.longitude,
           });
         },
-        (error) => console.log("Location error:", error),
+        (error) => {
+          toast.error("Enable location to see bus distances", {
+            id: "geo-error",
+          });
+        },
         { enableHighAccuracy: true },
       );
     }
 
     return () => {
-      console.log("🔌 Disconnecting...");
       socket.disconnect();
       socket.off("busOffline");
     };
@@ -81,10 +74,10 @@ const Home = () => {
     let distInMeters = null;
 
     if (userLocation && bus.lat && bus.lng) {
-      distInMeters = getDistance(
-        userLocation,
-        { latitude: bus.lat, longitude: bus.lng },
-      );
+      distInMeters = getDistance(userLocation, {
+        latitude: bus.lat,
+        longitude: bus.lng,
+      });
     }
 
     return { ...bus, distance: distInMeters };

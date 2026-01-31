@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Login from './pages/Login';
 import SetupBus from './pages/SetupBus';
 import Dashboard from './pages/Dashboard';
@@ -9,7 +10,6 @@ const RequireSetup = ({ children }) => {
     const busId = localStorage.getItem('MOUNTED_BUS_ID');
     
     if (!busId) {
-        console.log("Bus not set up. Redirecting to /setup");
         return <Navigate to="/setup" replace />;
     }
     
@@ -20,7 +20,6 @@ const PreventReSetup = ({ children }) => {
     const busId = localStorage.getItem('MOUNTED_BUS_ID');
     
     if (busId) {
-        console.log("Bus already set up. Skipping setup screen...");
         return <Navigate to="/trip" replace />; 
     }
     
@@ -30,6 +29,8 @@ const PreventReSetup = ({ children }) => {
 const App = () => {
   
   return (
+    <>
+    <Toaster position="top-center" />
     <BrowserRouter>
       <Routes>
         <Route path="/setup" element={
@@ -60,6 +61,7 @@ const App = () => {
         <Route path="*" element={<Navigate to="/trip" replace />} />
       </Routes>
     </BrowserRouter>
+    </>
   );
 };
 

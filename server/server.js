@@ -52,29 +52,16 @@ io.on("connection", (socket) => {
   }
 
   socket.on("driverLocation", (data) => {
-    console.log(
-      "📢 SERVER HEARD DRIVER:",
-      data.busPlate,
-      "at",
-      data.lat,
-      data.lng,
-    );
     const busData = {
       ...data,
       lastUpdated: Date.now(),
     };
 
     activeFleet[data.busId] = busData;
-
-    console.log("📡 BROADCASTING TO PASSENGERS...");
-
     io.emit("busUpdate", data);
-    console.log(`Bus ${data.busPlate} moved to ${data.lat}, ${data.lng}`);
   });
 
   socket.on("tripEnded", (busId) => {
-    console.log(`🧹 Cleaning up: Removing Bus ${busId} from active fleet.`);
-
     delete activeFleet[busId];
     io.emit("busOffline", { busId });
   });

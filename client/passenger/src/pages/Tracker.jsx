@@ -13,8 +13,11 @@ import io from "socket.io-client";
 import axios from "axios";
 import { ArrowLeft, Navigation, MapPin } from "lucide-react";
 import "leaflet/dist/leaflet.css";
+import { handleError, handleSuccess } from "../utils/toastUtils";
+import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 const busIcon = new L.Icon({
   iconUrl: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
@@ -85,7 +88,7 @@ const Tracker = () => {
   }, [busId]);
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+    const socket = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
     });
 
@@ -99,7 +102,7 @@ const Tracker = () => {
 
     socket.on("busOffline", (data) => {
       if (data.busId === busId) {
-        alert("This trip has ended!");
+        toast.error("Trip Ended: Bus went offline");
         navigate("/");
       }
     });
@@ -127,10 +130,11 @@ const Tracker = () => {
         await navigator.share(shareData);
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        alert("Tracking link copied to clipboard!");
+        handleSuccess("Tracking link copied to clipboard!");
       }
     } catch (err) {
       console.error("Error sharing:", err);
+      toast.error("Could not share link");
     }
   };
 

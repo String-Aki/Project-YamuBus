@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { handleSuccess } from "../utils/toastUtils";
 import {
   FaIdCard,
   FaVideo,
@@ -15,13 +17,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 const Login = () => {
   const navigate = useNavigate();
   
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   const startCamera = () => {
     setIsCameraOpen(true);
-    setError("");
 
     const html5QrCode = new Html5Qrcode("reader");
 
@@ -46,7 +46,7 @@ const Login = () => {
       )
       .catch((err) => {
         setIsCameraOpen(false);
-        setError("Camera failed to start. Please use Image Upload.");
+        toast.error("Camera failed to start. Please use Image Upload.");
       });
   };
 
@@ -55,7 +55,6 @@ const Login = () => {
     if (!file) return;
 
     const html5QrCode = new Html5Qrcode("reader");
-    setError("");
     setLoading(true);
 
     try {
@@ -63,13 +62,12 @@ const Login = () => {
       handleLogin(decodedText);
     } catch (err) {
       setLoading(false);
-      setError("Could not read QR from this image. Try another.");
+      toast.error("Could not read QR from this image. Try another.");
     }
   };
 
   const handleLogin = async (qrData) => {
     setLoading(true);
-    setError('');
 
     try {
         let credentials;
@@ -92,6 +90,7 @@ const Login = () => {
         });
 
         localStorage.setItem('driverInfo', JSON.stringify(data));
+        handleSuccess("Welcome, " + data.name);
         navigate('/dashboard');
 
     } catch (err) {
@@ -114,7 +113,7 @@ const Login = () => {
             friendlyMsg = err.message;
         }
 
-        setError(friendlyMsg);
+        toast.error(friendlyMsg);
         setLoading(false);
     }
   };

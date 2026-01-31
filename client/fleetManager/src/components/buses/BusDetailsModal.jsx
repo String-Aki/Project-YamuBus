@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaBus, FaMapSigns, FaTimes, FaTrash, FaCheckCircle, FaClock, FaFileAlt } from "react-icons/fa";
 import { auth } from "../../config/firebase.js";
+import { handleError, handleSuccess } from "../../utils/toastUtils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,8 +21,9 @@ const BusDetailsModal = ({ bus, isOpen, onClose, onDelete }) => {
       });
       onDelete(bus._id);
       onClose();
+      handleSuccess("Bus deleted successfully");
     } catch (error) {
-      alert("Failed to delete bus");
+      handleError(error, "Failed to delete bus");
     } finally {
       setLoading(false);
     }
