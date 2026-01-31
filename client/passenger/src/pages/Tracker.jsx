@@ -195,8 +195,13 @@ const Tracker = () => {
           <div className="flex justify-between items-end mb-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-lg shadow-sm">
-                  ROUTE {busData.routeNo}
+
+                <span className={`text-xs font-bold px-2 py-1 rounded-lg shadow-sm ${
+                    busData.operatorType === 'sltb' 
+                    ? "bg-red-600 text-white" 
+                    : "bg-blue-600 text-white"
+                }`}>
+                   {busData.operatorType === 'sltb' ? "SLTB" : "PVT"}
                 </span>
 
                 <span className="bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded-lg border border-yellow-500 shadow-sm">

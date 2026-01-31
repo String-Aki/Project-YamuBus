@@ -13,8 +13,9 @@ const createBus = asyncHandler(async (req, res) => {
   }
   const { plateNumber, route } = req.body;
 
-  const registrationCertificate = req.files?.['registrationCertificate']?.[0]?.path;
-  const routePermit = req.files?.['routePermit']?.[0]?.path;
+  const registrationCertificate =
+    req.files?.["registrationCertificate"]?.[0]?.path;
+  const routePermit = req.files?.["routePermit"]?.[0]?.path;
 
   if (!plateNumber || !route || !registrationCertificate || !routePermit) {
     res.status(400);
@@ -46,7 +47,9 @@ const createBus = asyncHandler(async (req, res) => {
 // @route GET /api/fleetmanager/buses
 // @access Private
 const getMyBuses = asyncHandler(async (req, res) => {
-  const buses = await Bus.find({ fleetManager: req.user._id }).sort({ createdAt: -1 });
+  const buses = await Bus.find({ fleetManager: req.user._id }).sort({
+    createdAt: -1,
+  });
   res.status(200).json(buses);
 });
 
@@ -91,10 +94,17 @@ const getBusesForSetup = asyncHandler(async (req, res) => {
       throw new Error("Manager not found in database");
     }
 
-    const buses = await Bus.find({ fleetManager: manager._id, verificationStatus: 'verified' 
-    }).select(
-      "plateNumber _id route",
-    );
+    const buses = await Bus.find({
+      fleetManager: manager._id,
+      verificationStatus: "verified",
+    }).select("plateNumber _id route");
+
+    const busesWithOperator = buses.map(bus => ({
+      _id: bus._id,
+      plateNumber: bus.plateNumber,
+      route: bus.route,
+      operatorType: manager.operatorType
+    }));
 
     res.json(buses);
   } catch (error) {
@@ -109,8 +119,8 @@ const getBusesForSetup = asyncHandler(async (req, res) => {
 // @access Public
 const getBusById = asyncHandler(async (req, res) => {
   const bus = await Bus.findById(req.params.id)
-    .populate('routeId')
-    .select('-registrationCertificate -routePermit -fleetManager');
+    .populate("routeId")
+    .select("-registrationCertificate -routePermit -fleetManager");
 
   if (bus) {
     res.json(bus);

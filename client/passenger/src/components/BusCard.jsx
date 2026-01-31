@@ -2,6 +2,21 @@ import React from 'react';
 import { Navigation, MapPin } from 'lucide-react';
 
 const BusCard = ({ bus, onClick }) => {
+  
+  const renderOperatorBadge = () => {
+    const isSLTB = bus.operatorType === 'sltb';
+    
+    return (
+      <span className={`text-[10px] font-bold px-2 py-0.5 rounded shadow-sm ${
+        isSLTB 
+          ? "bg-red-600 text-white" 
+          : "bg-blue-600 text-white"
+      }`}>
+        {isSLTB ? "SLTB" : "PVT"}
+      </span>
+    );
+  };
+
   return (
     <div 
       onClick={onClick}
@@ -16,12 +31,10 @@ const BusCard = ({ bus, onClick }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="h-16 w-16 bg-blue-600 rounded-2xl flex flex-col items-center justify-center text-white shadow-blue-200 shadow-lg group-hover:bg-blue-700 transition-colors">
-            <span className="text-xs font-medium opacity-80">ROUTE</span>
-            <span className="text-2xl font-black leading-none">{bus.routeNo || "000"}</span>
-        </div>
-
         <div className="flex-1 pr-8"> 
+          <div className="flex items-center gap-2 mb-1">
+                {renderOperatorBadge()}
+            </div>
             <h3 className="text-xl font-bold text-gray-800 leading-tight">
                 {bus.destination || "Unknown"}
             </h3>

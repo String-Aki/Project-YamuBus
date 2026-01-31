@@ -31,6 +31,7 @@ const Trip = () => {
     const storedTripId = localStorage.getItem("CURRENT_TRIP_ID");
     const storedBusPlate = localStorage.getItem("MOUNTED_BUS_PLATE");
     const storedBusId = localStorage.getItem("MOUNTED_BUS_ID");
+    const storedOperatorType = localStorage.getItem("MOUNTED_OPERATOR_TYPE") || "private";
     const driverData = JSON.parse(localStorage.getItem("driverInfo"));
 
     if (!storedTripId || !driverData) {
@@ -72,7 +73,7 @@ const Trip = () => {
           speed: speed || 0,
           heading: heading || 0,
 
-          routeNo: "Express",
+          operatorType: storedOperatorType,
           origin: originStr,
           destination: destStr,
         });

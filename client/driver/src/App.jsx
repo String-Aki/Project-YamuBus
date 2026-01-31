@@ -32,14 +32,11 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 1. SETUP PAGE (Protected against re-entry) */}
         <Route path="/setup" element={
             <PreventReSetup>
                 <SetupBus />
             </PreventReSetup>
         } />
-
-        {/* 2. PROTECTED PAGES (Require Bus ID to exist) */}
         <Route path="/login" element={
             <RequireSetup>
                 <Login />

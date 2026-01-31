@@ -68,6 +68,7 @@ const SetupBus = () => {
     if (!selectedBus) return;
     localStorage.setItem("MOUNTED_BUS_ID", selectedBus._id);
     localStorage.setItem("MOUNTED_BUS_PLATE", selectedBus.plateNumber);
+    localStorage.setItem("MOUNTED_OPERATOR_TYPE", selectedBus.operatorType || "private");
     if (selectedBus.route) {
       localStorage.setItem("MOUNTED_ROUTE_INFO", selectedBus.route);
     } else {
