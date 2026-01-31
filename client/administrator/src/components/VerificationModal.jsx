@@ -74,7 +74,7 @@ const VerificationModal = ({
                 <FaArrowLeft /> Back to Vehicle
               </button>
             ) : (
-              <div></div> /* Spacer to keep Close button on right */
+              <div></div>
             )}
 
             <button
