@@ -8,6 +8,7 @@ import {
   FaExclamationTriangle,
   FaExternalLinkAlt,
   FaChevronDown,
+  FaArrowLeft,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 
@@ -20,6 +21,7 @@ const VerificationModal = ({
   onClose,
   onAction,
   onInspectOwner,
+  onBack,
 }) => {
   const [routes, setRoutes] = useState([]);
   const [selectedRouteId, setSelectedRouteId] = useState("");
@@ -62,20 +64,38 @@ const VerificationModal = ({
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-lg rounded-[2rem] shadow-2xl animate-fadeIn relative overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="bg-slate-900 text-white p-6 relative flex-none">
-          <button
-            onClick={onClose}
-            className="absolute top-5 right-5 text-white/50 hover:text-white transition-colors"
-          >
-            <FaTimes size={20} />
-          </button>
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            {isManager ? (
-              <FaIdCard className="text-orange-400" />
+        <div className="bg-slate-900 text-white p-6 relative flex-none flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            {onBack ? (
+              <button
+                onClick={onBack}
+                className="text-white/80 hover:text-white flex items-center gap-2 text-xs font-bold transition-colors bg-white/10 px-3 py-1.5 rounded-full hover:bg-white/20"
+              >
+                <FaArrowLeft /> Back to Vehicle
+              </button>
             ) : (
-              <FaBus className="text-red-400" />
+              <div></div> /* Spacer to keep Close button on right */
             )}
-            {isManager ? "Investigate Application" : "Investigate Vehicle"}
+
+            <button
+              onClick={onClose}
+              className="text-white/50 hover:text-white transition-colors"
+            >
+              <FaTimes size={20} />
+            </button>
+          </div>
+
+          <h2 className="text-xl font-bold flex items-center gap-3">
+            {isManager ? (
+              <FaIdCard className="text-orange-400" size={24} />
+            ) : (
+              <FaBus className="text-red-400" size={24} />
+            )}
+            {onBack
+              ? "Owner Details"
+              : isManager
+                ? "Investigate Application"
+                : "Investigate Vehicle"}
           </h2>
         </div>
 
@@ -118,14 +138,17 @@ const VerificationModal = ({
               value={isManager ? data.organizationName : data.plateNumber}
             />
             <DetailBox
-              label={isManager ? "NIC Number" : "Route Number (Text)"}
+              label={isManager ? "NIC Number" : "Route Number"}
               value={isManager ? data.nicNumber : data.route}
             />
             {isManager && (
               <DetailBox label="Contact" value={data.contactPhone} />
             )}
             {isManager && (
-              <DetailBox label="Operator Type" value={data.operatorType} />
+              <DetailBox
+                label="Operator Type"
+                value={data.operatorType?.toUpperCase()}
+              />
             )}
           </div>
 
@@ -201,20 +224,24 @@ const VerificationModal = ({
             )}
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-slate-100">
-            <button
-              onClick={() => (isBus ? handleVerifyBus() : onAction("approved"))}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-green-200 text-sm"
-            >
-              {isManager ? "Approve Applicant" : "Verify & Assign"}
-            </button>
-            <button
-              onClick={() => onAction("rejected")}
-              className="flex-1 bg-white border-2 border-red-100 text-red-500 hover:bg-red-50 py-3.5 rounded-xl font-bold transition-all text-sm"
-            >
-              Reject
-            </button>
-          </div>
+          {!onBack && (
+            <div className="flex gap-3 pt-4 border-t border-slate-100">
+              <button
+                onClick={() =>
+                  isBus ? handleVerifyBus() : onAction("approved")
+                }
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-green-200 text-sm"
+              >
+                {isManager ? "Approve Applicant" : "Verify & Assign"}
+              </button>
+              <button
+                onClick={() => onAction("rejected")}
+                className="flex-1 bg-white border-2 border-red-100 text-red-500 hover:bg-red-50 py-3.5 rounded-xl font-bold transition-all text-sm"
+              >
+                Reject
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

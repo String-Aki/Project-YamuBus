@@ -1,7 +1,6 @@
-// client/src/pages/admin/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaClipboardList, FaShieldAlt, FaUsers } from "react-icons/fa";
+import { FaClipboardList, FaShieldAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
@@ -20,13 +19,14 @@ const Dashboard = () => {
   });
   const [pendingManagers, setPendingManagers] = useState([]);
   const [pendingBuses, setPendingBuses] = useState([]);
-  const [allManagers, setAllManagers] = useState([]);
 
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalType, setModalType] = useState(null);
+
+  const [previousItem, setPreviousItem] = useState(null);
 
   const navigate = useNavigate();
 
@@ -42,11 +42,6 @@ const Dashboard = () => {
       if (res.data?.pendingManagers)
         setPendingManagers(res.data.pendingManagers);
       if (res.data?.pendingBuses) setPendingBuses(res.data.pendingBuses);
-
-      if (activeTab === "directory") {
-        const dirRes = await axios.get(`${API_URL}/admin/managers`, config);
-        setAllManagers(dirRes.data);
-      }
     } catch (error) {
       console.error("Fetch Error:", error);
       if (error.response?.status === 401) navigate("/admin/login");
@@ -103,35 +98,31 @@ const Dashboard = () => {
         }
       }
       setSelectedItem(null);
+      setPreviousItem(null);
     } catch (error) {
       toast.error("Action Failed");
     }
   };
 
-  const handleDeleteManager = async (id) => {
-    if (
-      !window.confirm(
-        "WARNING: This will delete the manager and ALL their buses. Continue?",
-      )
-    )
-      return;
-    try {
-      const token = localStorage.getItem("adminToken");
-      await axios.delete(`${API_URL}/admin/managers/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success("Manager Deleted");
-      setAllManagers((prev) => prev.filter((m) => m._id !== id));
-    } catch (error) {
-      toast.error("Delete Failed");
-    }
-  };
-
   const handleInspectOwner = () => {
     if (selectedItem?.fleetManager) {
+      setPreviousItem(selectedItem);
       setSelectedItem(selectedItem.fleetManager);
       setModalType("manager");
     }
+  };
+
+  const handleBack = () => {
+    if (previousItem) {
+      setSelectedItem(previousItem);
+      setModalType("bus");
+      setPreviousItem(null);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedItem(null);
+    setPreviousItem(null);
   };
 
   if (loading)
@@ -166,12 +157,6 @@ const Dashboard = () => {
             label="Approvals"
             badge={stats.pendingManagers + stats.pendingBuses}
           />
-          <TabButton
-            active={activeTab === "directory"}
-            onClick={() => setActiveTab("directory")}
-            icon={<FaUsers />}
-            label="Directory"
-          />
         </div>
       </div>
 
@@ -186,35 +171,9 @@ const Dashboard = () => {
           onSelect={(item, type) => {
             setSelectedItem(item);
             setModalType(type);
+            setPreviousItem(null);
           }}
         />
-      )}
-
-      {activeTab === "directory" && (
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 animate-fadeIn p-6">
-          <p className="font-bold text-slate-400 uppercase text-xs mb-4">
-            Active Fleet Managers
-          </p>
-          {allManagers.map((mgr) => (
-            <div
-              key={mgr._id}
-              className="flex justify-between items-center p-4 hover:bg-slate-50 rounded-xl transition-colors border-b border-slate-50 last:border-0"
-            >
-              <div>
-                <h4 className="font-bold text-slate-800">
-                  {mgr.organizationName}
-                </h4>
-                <p className="text-xs text-slate-500">{mgr.contactPhone}</p>
-              </div>
-              <button
-                onClick={() => handleDeleteManager(mgr._id)}
-                className="text-red-400 hover:text-red-600 text-xs font-bold border border-red-100 px-3 py-1 rounded-full hover:bg-red-50"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
       )}
 
       <VerificationModal
@@ -224,6 +183,7 @@ const Dashboard = () => {
         onClose={() => setSelectedItem(null)}
         onAction={handleAction}
         onInspectOwner={handleInspectOwner}
+        onBack={previousItem ? handleBack : null}
       />
     </div>
   );
