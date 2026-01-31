@@ -28,13 +28,6 @@ const tripSchema = mongoose.Schema(
     endTime: {
       type: Date,
     },
-    locations: [
-      {
-        lat: Number,
-        lng: Number,
-        timestamp: { type: Date, default: Date.now }
-      }
-    ]
   },
   {
     timestamps: true,
