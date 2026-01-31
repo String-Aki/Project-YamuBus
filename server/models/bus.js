@@ -2,43 +2,53 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 const busSchema = new Schema(
-    {
-        licensePlate: {
-            type: String,
-            required: true,
-            unique: true,
-            trim: true,
-        },
-        capacity: {
-            type: Number,
-            default: 52,
-        },
-        fleetManager: {
-            type: Schema.Types.ObjectId,
-            ref: 'FleetManager',
-            required: true
-        },
-        route: {
-            type: Schema.Types.ObjectId,
-            ref: 'Route'
-        },
-        Driver: {
-            type: Schema.Types.ObjectId,
-            ref: 'Driver',
-        },
-        currentLocation: {
-            lat: {
-                type:Number,
-            },
-            lng:{
-                type:Number,
-            }
-        },
+  {
+    fleetManager: {
+      type: Schema.Types.ObjectId,
+      ref: "FleetManager",
+      required: true,
     },
-    {
-        timestamps: true,
-    }
+    plateNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      uppercase: true,
+    },
+    currentDriver: {
+      type: String,
+      default: null,
+    },
+    route: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    routeId: {
+      type: Schema.Types.ObjectId,
+      ref: "Route",
+      default: null,
+    },
+    registrationCertificate: {
+      type: String,
+      required: true,
+    },
+    routePermit: {
+      type: String,
+      required: true,
+    },
+    verificationStatus: {
+      type: String,
+      enum: ["pending", "verified", "rejected", "banned"],
+      default: "pending",
+    },
+
+    isActive: { type: Boolean, default: false },
+  },
+  {
+    timestamps: true,
+  },
 );
 
-const Bus = mongoose.model('Bus', busSchema);
+const Bus = mongoose.model("Bus", busSchema);
 export default Bus;
