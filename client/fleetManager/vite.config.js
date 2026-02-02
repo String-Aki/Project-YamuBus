@@ -35,22 +35,7 @@ export default defineConfig({
             type: "image/png",
             purpose: "maskable",
           },
-        ],
-        screenshots: [
-          {
-            src: "screenshot-mobile.png",
-            sizes: "540x720",
-            type: "image/png",
-            label: "Mobile View Example",
-          },
-          {
-            src: "screenshot-desktop.png",
-            sizes: "1280x720",
-            type: "image/png",
-            form_factor: "wide",
-            label: "Desktop View Example",
-          },
-        ],
+        ]
       },
       devOptions: {
         enabled: true,
@@ -58,7 +43,6 @@ export default defineConfig({
       },
     }),
   ],
-
   server: {
     host: true,
     port: 4173,
