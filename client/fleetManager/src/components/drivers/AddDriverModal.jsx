@@ -36,7 +36,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const token = await auth.currentUser.getIdToken();
@@ -67,7 +66,6 @@ const AddDriverModal = ({ isOpen, onClose, onDriverAdded }) => {
       username: "",
       password: "",
     });
-    setError("");
     onClose();
   };
 
