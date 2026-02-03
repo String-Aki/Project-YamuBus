@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword,sendPasswordResetEmail } from "firebase/auth";
 import { auth } from '../config/firebase.js'; 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -37,6 +37,21 @@ const Login = () => {
       handleError(error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      toast.error("Please enter your email address first");
+      return;
+    }
+
+    try {
+      await sendPasswordResetEmail(auth, formData.email);
+      handleSuccess("Password reset email sent! Check your inbox.");
+    } catch (error) {
+      console.error("Reset Password Error:", error);
+      handleError(error);
     }
   };
 
@@ -91,7 +106,9 @@ const Login = () => {
           </button>
 
           <div className="mt-6 text-center text-white space-y-4">
-            <p className="text-sm text-gray-400 cursor-pointer">Forgot Password?</p>
+            <p className="text-sm text-gray-400 cursor-pointer"
+            onClick={handleForgotPassword}
+            >Forgot Password?</p>
             <p className="text-sm">
               Don't have an account? <span className="font-bold underline cursor-pointer" onClick={() => navigate('/register')}>Sign Up</span>
             </p>

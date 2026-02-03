@@ -33,7 +33,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Bus Tracking App Is Running");
+  res.send("YamuBus App Is Running");
 });
 
 app.use("/api/fleetmanagers", fleetManagerRoutes);
