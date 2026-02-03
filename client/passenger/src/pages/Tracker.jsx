@@ -11,7 +11,7 @@ import {
 import L from "leaflet";
 import io from "socket.io-client";
 import axios from "axios";
-import { ArrowLeft, Navigation, MapPin, Crosshair } from "lucide-react";
+import { ArrowLeft, Navigation, MapPin, Crosshair, Bus } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import { handleError, handleSuccess } from "../utils/toastUtils";
 import toast from "react-hot-toast";
@@ -173,6 +173,16 @@ const Tracker = () => {
     }
   };
 
+  const handleRecenterBus = () => {
+    if (busData) {
+      setMapCenter([busData.lat, busData.lng]);
+      setRecenterTrigger((prev) => prev + 1);
+      handleSuccess("Located Bus!");
+    } else {
+      toast.error("Bus location unknown");
+    }
+  };
+
   const handleShare = async () => {
     const shareData = {
       title: `Track Bus ${busData.routeNo}`,
@@ -211,7 +221,7 @@ const Tracker = () => {
       </button>
 
       <MapContainer
-        center={[busData.lat, busData.lng]}
+        center={mapCenter || [busData.lat, busData.lng]}
         zoom={15}
         zoomControl={false}
         className="w-full h-full z-0"
@@ -259,12 +269,22 @@ const Tracker = () => {
         <RecenterMap center={mapCenter} trigger={recenterTrigger} />
       </MapContainer>
 
-      <button
-        onClick={handleRecenterUser}
-        className="absolute bottom-80 right-4 z-[2000] bg-white p-3 rounded-full shadow-lg border border-gray-100 text-blue-600 hover:bg-blue-50 active:scale-90 transition-all"
-      >
-        <Crosshair size={24} />
-      </button>
+      <div className="absolute bottom-80 right-4 z-[2000] flex flex-col gap-4">
+        
+        <button
+          onClick={handleRecenterBus}
+          className="bg-white p-3 rounded-full shadow-lg border border-gray-100 text-brand-brown hover:bg-orange-50 active:scale-90 transition-all"
+        >
+          <Bus size={24} className="text-orange-600" />
+        </button>
+
+        <button
+          onClick={handleRecenterUser}
+          className="bg-white p-3 rounded-full shadow-lg border border-gray-100 text-blue-600 hover:bg-blue-50 active:scale-90 transition-all"
+        >
+          <Crosshair size={24} />
+        </button>
+      </div>
 
       <div
         className={`absolute bottom-0 left-0 right-0 z-[1000] bg-white rounded-t-[30px] shadow-[0_-5px_30px_rgba(0,0,0,0.1)] transition-all duration-300 ease-in-out ${
