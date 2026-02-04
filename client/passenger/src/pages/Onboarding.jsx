@@ -28,8 +28,7 @@ const Onboarding = () => {
       title: "Start Your Journey",
       description: "Find your route, hop on, and travel with confidence.",
       icon: <Bus size={80} className="text-white drop-shadow-lg" />,
-      color: "bg-indigo-600",
-      image: "https://images.unsplash.com/photo-1494515855673-102c96986359?q=80&w=2070&auto=format&fit=crop"
+      color: "bg-indigo-600"
     },
   ];
 
