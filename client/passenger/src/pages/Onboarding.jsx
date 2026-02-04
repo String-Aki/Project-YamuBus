@@ -57,8 +57,7 @@ const Onboarding = () => {
         >
           <div className={`absolute inset-0 ${step.color} mix-blend-multiply opacity-90 z-10`} />
           <img 
-            src={step.image} 
-            alt={step.title} 
+            src={step.image}  
             className="w-full h-full object-cover"
           />
         </div>
