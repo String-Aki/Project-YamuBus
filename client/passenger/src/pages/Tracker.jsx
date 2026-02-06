@@ -7,6 +7,7 @@ import {
   Popup,
   useMap,
   Polyline,
+  useMapEvents,
 } from "react-leaflet";
 import L from "leaflet";
 import io from "socket.io-client";
@@ -47,9 +48,14 @@ const userIcon = new L.DivIcon({
 
 const RecenterMap = ({ center, trigger }) => {
   const map = useMap();
+  
   useEffect(() => {
-    if (center && center[0] && center[1]) {
-      map.flyTo(center, 15, { animate: true, duration: 1.5 });
+    if (center && Array.isArray(center) && center.length === 2) {
+      map.flyTo(center, 15, { 
+        animate: true, 
+        duration: 1.5,
+        easeLinearity: 0.25 
+      });
     }
   }, [trigger]);
   return null;
@@ -72,6 +78,13 @@ const getCardinalDirection = (angle) => {
   return directions[index];
 };
 
+const MapEventHandler = ({ onInteraction }) => {
+  useMapEvents({
+    dragstart: () => onInteraction(),
+  });
+  return null;
+};
+
 const Tracker = () => {
   const { busId } = useParams();
   const location = useLocation();
@@ -83,6 +96,7 @@ const Tracker = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [mapCenter, setMapCenter] = useState(null);
   const [recenterTrigger, setRecenterTrigger] = useState(0);
+  const [isTracking, setIsTracking] = useState(true);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
@@ -115,10 +129,6 @@ const Tracker = () => {
     socket.on("busUpdate", (data) => {
       if (data.busId === busId) {
         setBusData(data);
-        if (!mapCenter) {
-          setMapCenter([data.lat, data.lng]);
-          setRecenterTrigger((prev) => prev + 1);
-        }
       }
     });
 
@@ -144,6 +154,13 @@ const Tracker = () => {
     return () => socket.disconnect();
   }, [busId, navigate]);
 
+  useEffect(() => {
+      if (isTracking && busData) {
+        setMapCenter([busData.lat, busData.lng]);
+        setRecenterTrigger((prev) => prev + 1);
+      }
+    }, [busData, isTracking]);
+
   const minSwipeDistance = 50;
 
   const onTouchStart = (e) => {
@@ -164,6 +181,8 @@ const Tracker = () => {
   };
 
   const handleRecenterUser = () => {
+    setIsTracking(false);
+
     if (userLocation) {
       setMapCenter(userLocation);
       setRecenterTrigger((prev) => prev + 1);
@@ -174,12 +193,20 @@ const Tracker = () => {
   };
 
   const handleRecenterBus = () => {
+    setIsTracking(true);
+
     if (busData) {
       setMapCenter([busData.lat, busData.lng]);
       setRecenterTrigger((prev) => prev + 1);
       handleSuccess("Located Bus!");
     } else {
       toast.error("Bus location unknown");
+    }
+  };
+
+  const handleUserInteraction = () => {
+    if (isTracking) {
+      setIsTracking(false);
     }
   };
 
@@ -226,6 +253,7 @@ const Tracker = () => {
         zoomControl={false}
         className="w-full h-full z-0"
       >
+        <MapEventHandler onInteraction={handleUserInteraction} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -270,7 +298,6 @@ const Tracker = () => {
       </MapContainer>
 
       <div className="absolute bottom-80 right-4 z-[2000] flex flex-col gap-4">
-        
         <button
           onClick={handleRecenterBus}
           className="bg-white p-3 rounded-full shadow-lg border border-gray-100 text-brand-brown hover:bg-orange-50 active:scale-90 transition-all"
