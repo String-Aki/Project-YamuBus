@@ -7,3 +7,5 @@ client/fleetManager/.env
 client/passenger/.env
 server/seedAdmin.js
 client/administrator/.env
+simulation/route.json
+simulation/simulate.js
